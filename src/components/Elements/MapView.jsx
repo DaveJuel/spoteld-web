@@ -17,6 +17,5 @@ export default function MapView() {
 
 const MapWrapper = styled.div`
   height: 100%;
-  border-radius: 8px;
   overflow: hidden;
 `;

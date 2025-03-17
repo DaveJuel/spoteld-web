@@ -50,7 +50,6 @@ const ContentWrapper = styled.div`
   flex: 1;
   height: 100%;
   padding: 0;
-  gap: 20px;
   transition: all 0.3s ease;
   margin-left: 0;
 `;
@@ -58,10 +57,8 @@ const ContentWrapper = styled.div`
 const LeftSection = styled.div`
   flex: 1;
   display: flex;
-  min-width: 300px;
-  max-width: 450px;
+  width: 100%;
   height: 100%;
-  border-right: 1px solid #ddd;
 `;
 
 const FormContainer = styled.div`
