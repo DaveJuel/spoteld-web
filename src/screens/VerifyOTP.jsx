@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AuthContainer from "../components/Elements/AuthContainer";
 import AuthForm from "../components/Elements/AuthForm";
 
@@ -6,20 +7,41 @@ export default function VerifyOTP() {
   const [formData, setFormData] = useState({ otp: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+    setMessage("");
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/auth/verify/`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ otp: formData.otp }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        navigate("/login");  // Redirect to login page upon successful OTP verification
+      } else {
+        setMessage(result.message || "OTP verification failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during OTP verification:", error);
+      setMessage("An error occurred. Please try again.");
+    } finally {
       setLoading(false);
-      setMessage("OTP Verified! Redirecting to dashboard...");
-      window.location.href = "/home";
-    }, 2000);
+    }
   };
 
   return (
@@ -33,7 +55,7 @@ export default function VerifyOTP() {
         loading={loading}
         buttonText="Verify"
       />
-      {message && <p style={{ color: "green" }}>{message}</p>}
+      {message && <p style={{ color: "red" }}>{message}</p>}
     </AuthContainer>
   );
 }
