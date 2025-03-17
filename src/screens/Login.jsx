@@ -18,7 +18,7 @@ export default function Login() {
     setMessage("");
     try {
       setMessage("Authenticated successfully! Redirecting...");
-      window.location.href = "/home";
+      window.location.href = "/routes";
     } catch (error) {
       setMessage("An error occurred. Please try again.");
     } finally {
