@@ -2,36 +2,6 @@
 
 import styled from "styled-components";
 
-export const TripsList = styled.div`
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-`;
-
-export const TripListHeader = styled.div`
-  padding: 20px;
-  border-bottom: 1px solid #eee;
-  position: sticky;
-  top: 0;
-  background: white;
-  z-index: 1;
-  
-  h2 {
-    margin: 0 0 10px 0;
-    color: #333;
-  }
-`;
-
-export const FilterContainer = styled.div`
-  select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: #f9f9f9;
-  }
-`;
-
 export const TripItem = styled.div`
   padding: 15px 20px;
   border-bottom: 1px solid #eee;

@@ -1,22 +1,5 @@
 import styled from "styled-components";
 
-
-export const ProfileNav = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-`;
-
-export const ProfileNavHeader = styled.div`
-  padding: 20px;
-  border-bottom: 1px solid #eee;
-
-  h2 {
-    margin: 0;
-    color: #333;
-  }
-`;
-
 export const ProfileContent = styled.div`
   background: white;
   padding: 25px;

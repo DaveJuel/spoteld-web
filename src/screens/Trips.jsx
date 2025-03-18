@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import SidebarNav from "../components/Nav/Sidebar";
 import MapView from "../components/Elements/MapView";
-import { MainContainer, ContentWrapper, LeftSection, RightSection } from "../style/view.styles";
+import MainLayout from "../components/Layout/MainLayout";
+import { MapContainer } from "react-leaflet";
 import {
-  FilterContainer,
   InfoItem,
   InfoLabel,
   InfoValue,
@@ -18,25 +17,14 @@ import {
   TripHeader,
   TripInfoGrid,
   TripItem,
-  TripListHeader,
   TripName,
-  TripsList,
   TripStatus,
 } from "../style/trips.styles";
-import { MapContainer } from "react-leaflet";
+import { FilterContainer, LeftSectionContainer, LeftSectionHeader } from "../style/view.styles";
 
 export default function Trips() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [sidebarWidth, setSidebarWidth] = useState(240);
   const [selectedTrip, setSelectedTrip] = useState(null);
 
-  // Function to handle sidebar state changes
-  const handleSidebarChange = (isOpen, width) => {
-    setSidebarOpen(isOpen);
-    setSidebarWidth(width);
-  };
-
-  // Dummy trip data
   const tripsData = [
     {
       id: 1,
@@ -110,105 +98,105 @@ export default function Trips() {
     },
   ];
 
+  // Create the left content (trip list)
+  const leftContent = (
+    <LeftSectionContainer >
+      <LeftSectionHeader >
+        <h2>My Trips</h2>
+        <FilterContainer>
+          <select defaultValue="all">
+            <option value="all">All Trips</option>
+            <option value="completed">Completed</option>
+            <option value="in-progress">In Progress</option>
+            <option value="scheduled">Scheduled</option>
+          </select>
+        </FilterContainer>
+      </LeftSectionHeader>
+      {tripsData.map((trip) => (
+        <TripItem
+          key={trip.id}
+          onClick={() => setSelectedTrip(trip)}
+          isSelected={selectedTrip && selectedTrip.id === trip.id}
+        >
+          <TripName>{trip.name}</TripName>
+          <TripDate>{trip.date}</TripDate>
+          <TripDistance>{trip.distance}</TripDistance>
+          <TripStatus status={trip.status}>{trip.status}</TripStatus>
+        </TripItem>
+      ))}
+    </LeftSectionContainer>
+  );
+
+  // Create the right content (trip details and map)
+  const rightContent = selectedTrip ? (
+    <TripDetails>
+      <TripHeader>
+        <h1>{selectedTrip.name}</h1>
+        <StatusBadge status={selectedTrip.status}>
+          {selectedTrip.status}
+        </StatusBadge>
+      </TripHeader>
+
+      <TripInfoGrid>
+        <InfoItem>
+          <InfoLabel>Date</InfoLabel>
+          <InfoValue>{selectedTrip.date}</InfoValue>
+        </InfoItem>
+        <InfoItem>
+          <InfoLabel>Distance</InfoLabel>
+          <InfoValue>{selectedTrip.distance}</InfoValue>
+        </InfoItem>
+        <InfoItem>
+          <InfoLabel>Duration</InfoLabel>
+          <InfoValue>{selectedTrip.duration}</InfoValue>
+        </InfoItem>
+        <InfoItem>
+          <InfoLabel>Driver</InfoLabel>
+          <InfoValue>{selectedTrip.driver}</InfoValue>
+        </InfoItem>
+        <InfoItem>
+          <InfoLabel>Carrier</InfoLabel>
+          <InfoValue>{selectedTrip.carrier}</InfoValue>
+        </InfoItem>
+      </TripInfoGrid>
+
+      <RouteDetails>
+        <h3>Route Details</h3>
+        <RoutePoint type="start">
+          {selectedTrip.startLocation}
+        </RoutePoint>
+        {selectedTrip.stops.map((stop, index) => (
+          <RoutePoint key={index} type="stop">
+            {stop}
+          </RoutePoint>
+        ))}
+        <RoutePoint type="end">{selectedTrip.endLocation}</RoutePoint>
+      </RouteDetails>
+
+      <NotesSection>
+        <h3>Notes</h3>
+        <p>{selectedTrip.notes}</p>
+      </NotesSection>
+
+      <MapContainer>
+        <MapView tripData={selectedTrip} />
+      </MapContainer>
+    </TripDetails>
+  ) : (
+    <NoSelection>
+      <h2>Select a trip to view details</h2>
+      <p>
+        Choose a trip from the list on the left to view its details.
+      </p>
+    </NoSelection>
+  );
+
   return (
-    <MainContainer >
-      <SidebarNav
-        onStateChange={handleSidebarChange}
-        sidebarOpen={sidebarOpen}
-      />
-      <ContentWrapper sidebarWidth={sidebarWidth}>
-        <LeftSection>
-          <TripsList>
-            <TripListHeader>
-              <h2>My Trips</h2>
-              <FilterContainer>
-                <select defaultValue="all">
-                  <option value="all">All Trips</option>
-                  <option value="completed">Completed</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="scheduled">Scheduled</option>
-                </select>
-              </FilterContainer>
-            </TripListHeader>
-            {tripsData.map((trip) => (
-              <TripItem
-                key={trip.id}
-                onClick={() => setSelectedTrip(trip)}
-                isSelected={selectedTrip && selectedTrip.id === trip.id}
-              >
-                <TripName>{trip.name}</TripName>
-                <TripDate>{trip.date}</TripDate>
-                <TripDistance>{trip.distance}</TripDistance>
-                <TripStatus status={trip.status}>{trip.status}</TripStatus>
-              </TripItem>
-            ))}
-          </TripsList>
-        </LeftSection>
-        <RightSection>
-          {selectedTrip ? (
-            <TripDetails>
-              <TripHeader>
-                <h1>{selectedTrip.name}</h1>
-                <StatusBadge status={selectedTrip.status}>
-                  {selectedTrip.status}
-                </StatusBadge>
-              </TripHeader>
-
-              <TripInfoGrid>
-                <InfoItem>
-                  <InfoLabel>Date</InfoLabel>
-                  <InfoValue>{selectedTrip.date}</InfoValue>
-                </InfoItem>
-                <InfoItem>
-                  <InfoLabel>Distance</InfoLabel>
-                  <InfoValue>{selectedTrip.distance}</InfoValue>
-                </InfoItem>
-                <InfoItem>
-                  <InfoLabel>Duration</InfoLabel>
-                  <InfoValue>{selectedTrip.duration}</InfoValue>
-                </InfoItem>
-                <InfoItem>
-                  <InfoLabel>Driver</InfoLabel>
-                  <InfoValue>{selectedTrip.driver}</InfoValue>
-                </InfoItem>
-                <InfoItem>
-                  <InfoLabel>Carrier</InfoLabel>
-                  <InfoValue>{selectedTrip.carrier}</InfoValue>
-                </InfoItem>
-              </TripInfoGrid>
-
-              <RouteDetails>
-                <h3>Route Details</h3>
-                <RoutePoint type="start">
-                  {selectedTrip.startLocation}
-                </RoutePoint>
-                {selectedTrip.stops.map((stop, index) => (
-                  <RoutePoint key={index} type="stop">
-                    {stop}
-                  </RoutePoint>
-                ))}
-                <RoutePoint type="end">{selectedTrip.endLocation}</RoutePoint>
-              </RouteDetails>
-
-              <NotesSection>
-                <h3>Notes</h3>
-                <p>{selectedTrip.notes}</p>
-              </NotesSection>
-
-              <MapContainer >
-                <MapView tripData={selectedTrip} />
-              </MapContainer>
-            </TripDetails>
-          ) : (
-            <NoSelection>
-              <h2>Select a trip to view details</h2>
-              <p>
-                Choose a trip from the list on the left to view its details.
-              </p>
-            </NoSelection>
-          )}
-        </RightSection>
-      </ContentWrapper>
-    </MainContainer>
+    <MainLayout
+      leftContent={leftContent}
+      rightContent={rightContent}
+      initialSidebarWidth={240}
+      initialSidebarState={true}
+    />
   );
 }

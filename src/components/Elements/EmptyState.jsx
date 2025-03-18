@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import {ActionButton} from "../../style/view.styles"
 
 const EmptyState = ({ message, actionLabel, action }) => {
   return (
@@ -52,25 +53,6 @@ const Message = styled.p`
   font-size: 18px;
   color: #666;
   margin-bottom: 20px;
-`;
-
-const ActionButton = styled.button`
-  background-color: #1976d2;
-  color: white;
-  font-size: 16px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #1565c0;
-  }
-
-  &:focus {
-    outline: none;
-  }
 `;
 
 export default EmptyState;
