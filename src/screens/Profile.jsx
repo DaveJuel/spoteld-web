@@ -1,11 +1,17 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import SidebarNav from "../components/Nav/Sidebar";
-import { FaUser, FaTruck, FaEdit, FaSave, FaCar, FaPlus, FaList } from "react-icons/fa";
+import {
+  FaUser,
+  FaEdit,
+  FaSave,
+  FaTruck,
+  FaPlus,
+  FaList,
+} from "react-icons/fa";
 
 // Import new components
 import DriverForm from "../components/Elements/DriverForm";
-import CarrierForm from "../components/Elements/CarrierForm";
 import VehicleForm from "../components/Elements/VehicleForm";
 import VehicleList from "../components/Elements/VehicleList";
 
@@ -21,20 +27,6 @@ export default function Profile() {
     setSidebarOpen(isOpen);
     setSidebarWidth(width);
   };
-
-  const [carrierProfile, setCarrierProfile] = useState({
-    id: "CR-5678",
-    companyName: "Fast Logistics Inc.",
-    dot: "DOT-12345678",
-    mcNumber: "MC-987654",
-    email: "dispatch@fastlogistics.com",
-    phone: "(555) 765-4321",
-    address: "456 Commerce Dr, Businesstown, USA",
-    fleetSize: 28,
-    insuranceProvider: "SafeHaul Insurance",
-    insurancePolicy: "INS-789012345",
-    insuranceExpiry: "2026-03-30",
-  });
 
   const toggleEdit = () => {
     setEditing(!editing);
@@ -59,6 +51,16 @@ export default function Profile() {
             </ProfileNavHeader>
             <NavTabs>
               <NavTab
+                active={activeTab === "vehicle"}
+                onClick={() => {
+                  setActiveTab("vehicle");
+                  setSelectedVehicleId(null);
+                }}
+              >
+                <FaTruck />
+                <span>Vehicles</span>
+              </NavTab>
+              <NavTab
                 active={activeTab === "driver"}
                 onClick={() => {
                   setActiveTab("driver");
@@ -67,26 +69,6 @@ export default function Profile() {
               >
                 <FaUser />
                 <span>Driver</span>
-              </NavTab>
-              <NavTab
-                active={activeTab === "carrier"}
-                onClick={() => {
-                  setActiveTab("carrier");
-                  setSelectedVehicleId(null);
-                }}
-              >
-                <FaTruck />
-                <span>Carrier</span>
-              </NavTab>
-              <NavTab
-                active={activeTab === "vehicle"}
-                onClick={() => {
-                  setActiveTab("vehicle");
-                  setSelectedVehicleId(null);
-                }}
-              >
-                <FaCar />
-                <span>Vehicles</span>
               </NavTab>
             </NavTabs>
           </ProfileNav>
@@ -110,29 +92,20 @@ export default function Profile() {
                 </ActionButton>
               ) : (
                 <ActionButton onClick={handleAddVehicle}>
-                  {!editing ? <FaPlus />: <FaList />}
-                  {!editing ? "Add Vehicle":"Saved Vehicles"}
+                  {!editing ? <FaPlus /> : <FaList />}
+                  {!editing ? "Add Vehicle" : "Saved Vehicles"}
                 </ActionButton>
               )}
             </ProfileHeader>
 
             <>
-              {activeTab === "driver" && <DriverForm editing={editing} setEditing={setEditing} />}
-
-              {activeTab === "carrier" && (
-                <CarrierForm
-                  carrierProfile={carrierProfile}
-                  editing={editing}
-                  onChange={setCarrierProfile}
-                />
+              {activeTab === "driver" && (
+                <DriverForm editing={editing} setEditing={setEditing} />
               )}
 
               {activeTab === "vehicle" &&
                 selectedVehicleId === null &&
-                !editing && (
-                  <VehicleList
-                  />
-                )}
+                !editing && <VehicleList />}
 
               {activeTab === "vehicle" &&
                 (selectedVehicleId !== null || editing) && (
