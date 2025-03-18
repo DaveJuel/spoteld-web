@@ -22,15 +22,15 @@ export const loginUser = async (username, password) => {
 }
 
 export const logoutUser = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("loginToken");
 }
 
 export const isUserLoggedIn = () => {
-    const user = localStorage.getItem("user");
+    const user = localStorage.getItem("loginToken");
     return !!user;
 }
 
-export const getLoggedInUser = () => {
-    return isUserLoggedIn() ? JSON.parse(localStorage.getItem('user')) : null;
+export const getLoggedInToken = () => {
+    return isUserLoggedIn() ? localStorage.getItem('loginToken'): null;
 }
 

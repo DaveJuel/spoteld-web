@@ -1,101 +1,112 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { makeApiRequest } from "../../utils/RequestHandler";
+import LoadingSpinner from "../Elements/LoadingSpinner";
 
-const DriverForm = ({ driverProfile, editing, onChange }) => {
+const DriverForm = () => {
+  const [driverProfile, setDriverProfile] = useState(null);
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [isNewProfile, setIsNewProfile] = useState(true);
+  const statuses = ["off duty", "sleeper berth", "driving", "on duty"];
+
+  useEffect(() => {
+    const fetchDriverProfile = async () => {
+      setLoading(true);
+      try {
+        const response = await makeApiRequest("/api/driver/user", "GET");
+        setDriverProfile(response);
+        if(response) setIsNewProfile(false);
+      } catch (error) {
+        console.error("Failed to fetch driver profile:", error);
+        setDriverProfile(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchVehicles = async () => {
+      try {
+        const response = await makeApiRequest("/api/vehicle/all", "GET", null);
+        setVehicles(response.vehicles || []);
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+      }
+    };
+
+    setEditing(true);
+    fetchDriverProfile();
+    fetchVehicles();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    onChange({ ...driverProfile, [name]: value });
+    setDriverProfile((prevProfile) => ({ ...prevProfile, [name]: value }));
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if(isNewProfile) {
+        await makeApiRequest("/api/driver/", "POST", driverProfile);
+      }else{
+        await makeApiRequest(`/api/driver/${driverProfile.id}/edit`, "PATCH", driverProfile);
+      }
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      alert("Failed to update profile. Please try again.");
+    }
+  };
+
+  if (loading) return <LoadingSpinner />;
+
   return (
-    <ProfileGrid>
-      <FormGroup>
-        <Label>Driver ID</Label>
-        <Input name="id" value={driverProfile.id} disabled />
-      </FormGroup>
-      <FormGroup>
-        <Label>First Name</Label>
-        <Input 
-          name="firstName"
-          value={driverProfile.firstName} 
-          disabled={!editing}
-          onChange={handleChange}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Last Name</Label>
-        <Input 
-          name="lastName"
-          value={driverProfile.lastName} 
-          disabled={!editing}
-          onChange={handleChange}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Email</Label>
-        <Input 
-          name="email"
-          value={driverProfile.email} 
-          disabled={!editing}
-          onChange={handleChange}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Phone</Label>
-        <Input 
-          name="phone"
-          value={driverProfile.phone} 
-          disabled={!editing}
-          onChange={handleChange}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>License Number</Label>
-        <Input 
-          name="licenseNumber"
-          value={driverProfile.licenseNumber} 
-          disabled={!editing}
-          onChange={handleChange}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>License Expiry</Label>
-        <Input 
-          name="licenseExpiry"
-          type="date" 
-          value={driverProfile.licenseExpiry} 
-          disabled={!editing}
-          onChange={handleChange}
-        />
-      </FormGroup>
-      <FormGroup fullWidth>
-        <Label>Address</Label>
-        <Input 
-          name="address"
-          value={driverProfile.address} 
-          disabled={!editing}
-          onChange={handleChange}
-        />
-      </FormGroup>
-      <FormGroup fullWidth>
-        <Label>Emergency Contact</Label>
-        <Input 
-          name="emergencyContact"
-          value={driverProfile.emergencyContact} 
-          disabled={!editing}
-          onChange={handleChange}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Experience</Label>
-        <Input 
-          name="experience"
-          value={driverProfile.experience} 
-          disabled={!editing}
-          onChange={handleChange}
-        />
-      </FormGroup>
-    </ProfileGrid>
+    <form onSubmit={handleSubmit}>
+      <ProfileGrid>
+        <FormGroup>
+          <Label>Vehicle ID</Label>
+          <SelectBox
+            name="vehicle"
+            value={driverProfile?.vehicle || ""}
+            onChange={handleChange}
+            disabled={!editing}
+          >
+            <option value="">Select a vehicle</option>
+            {vehicles.map((vehicle) => (
+              <option key={vehicle.id} value={vehicle.id}>
+                {vehicle.name || `Vehicle ${vehicle.id}`}
+              </option>
+            ))}
+          </SelectBox>
+        </FormGroup>
+        
+        <FormGroup>
+          <Label>Current Status</Label>
+          <SelectBox
+            name="current_status"
+            value={driverProfile?.current_status || ""}
+            onChange={handleChange}
+            disabled={!editing}
+          >
+            <option value="">Select a status</option>
+            {statuses.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </SelectBox>
+        </FormGroup>
+        
+        <FormGroup fullWidth>
+          <SubmitButton type="submit" disabled={!editing}>
+            Submit
+          </SubmitButton>
+        </FormGroup>
+      </ProfileGrid>
+    </form>
   );
 };
 
@@ -108,7 +119,7 @@ const ProfileGrid = styled.div`
 `;
 
 const FormGroup = styled.div`
-  grid-column: ${props => props.fullWidth ? '1 / -1' : 'auto'};
+  grid-column: ${(props) => (props.fullWidth ? "1 / -1" : "auto")};
 `;
 
 const Label = styled.label`
@@ -118,17 +129,32 @@ const Label = styled.label`
   font-size: 14px;
 `;
 
-const Input = styled.input`
-  width: 100%;
+const SelectBox = styled.select`
+  width: 97%;
   padding: 10px;
-  border: 1px solid ${props => props.disabled ? '#ddd' : '#ccc'};
-  border-radius: 4px;
-  background: ${props => props.disabled ? '#f9f9f9' : 'white'};
-  color: ${props => props.disabled ? '#666' : '#333'};
-  
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.3s;
   &:focus {
-    outline: none;
-    border-color: #2c3e50;
-    box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
+    border-color: #4caf50;
+  }
+`;
+
+const SubmitButton = styled.button`
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  &:hover {
+    background-color: #45a049;
+  }
+  &:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
   }
 `;

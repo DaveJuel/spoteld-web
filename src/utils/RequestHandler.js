@@ -1,3 +1,5 @@
+import { getLoggedInToken } from "./AuthHandler";
+
 export const apiKey = process.env.REACT_APP_API_KEY;
 export const appUrl = process.env.REACT_APP_API_URL;
 export const publicUser = process.env.REACT_APP_PUBLIC_USERNAME;
@@ -23,8 +25,14 @@ export const getUserCredentials = () => {
  * Helper function to make API requests
  */
 export const makeApiRequest = async (path, method, requestBody, headers = {
-  "Content-Type": "application/json",
+  "Content-Type": "application/json"
 }) => {
+
+  const token = getLoggedInToken();
+  headers = {
+    "Content-Type": "application/json",
+    "Authorization": `Token ${token}`
+  }
 
   const options = {
     method,

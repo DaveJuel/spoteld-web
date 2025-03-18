@@ -22,21 +22,6 @@ export default function Profile() {
     setSidebarWidth(width);
   };
 
-  // Dummy profile data
-  const [driverProfile, setDriverProfile] = useState({
-    id: "DR-1234",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "(555) 123-4567",
-    licenseNumber: "DL-987654321",
-    licenseExpiry: "2028-05-15",
-    address: "123 Main Street, Anytown, USA",
-    emergencyContact: "Jane Doe - (555) 987-6543",
-    experience: "5 years",
-    preferredRoutes: ["East Coast", "Midwest"],
-  });
-
   const [carrierProfile, setCarrierProfile] = useState({
     id: "CR-5678",
     companyName: "Fast Logistics Inc.",
@@ -50,60 +35,7 @@ export default function Profile() {
     insurancePolicy: "INS-789012345",
     insuranceExpiry: "2026-03-30",
   });
-
-  // Vehicle data
-  const [vehicles, setVehicles] = useState([
-    {
-      id: "VH-001",
-      make: "Freightliner",
-      model: "Cascadia",
-      year: 2020,
-      vin: "1FUJGBDV9LLXXXXXX",
-      licensePlate: "TRK-1234",
-      state: "CA",
-      registrationExpiry: "2026-03-15",
-      lastInspection: "2024-12-10",
-      status: "active",
-      notes: "Regular maintenance performed on schedule",
-    },
-    {
-      id: "VH-002",
-      make: "Peterbilt",
-      model: "579",
-      year: 2019,
-      vin: "2PTRGLMD8KYXXXXXX",
-      licensePlate: "TRK-5678",
-      state: "TX",
-      registrationExpiry: "2025-08-22",
-      lastInspection: "2024-11-05",
-      status: "maintenance",
-      notes: "Needs transmission service",
-    },
-  ]);
-
-  const [activeVehicleId, setActiveVehicleId] = useState("VH-001");
-
-  // Default empty vehicle for new entries
-  const emptyVehicle = {
-    id: "",
-    make: "",
-    model: "",
-    year: new Date().getFullYear(),
-    vin: "",
-    licensePlate: "",
-    state: "",
-    registrationExpiry: "",
-    lastInspection: "",
-    status: "inactive",
-    notes: "",
-  };
-
-  // Get the currently selected vehicle
-  const getSelectedVehicle = () => {
-    if (!selectedVehicleId) return emptyVehicle;
-    return vehicles.find((v) => v.id === selectedVehicleId) || emptyVehicle;
-  };
-
+  
   // Toggle edit mode
   const toggleEdit = () => {
     setEditing(!editing);
@@ -113,57 +45,8 @@ export default function Profile() {
     }
   };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setEditing(false);
-    setSelectedVehicleId(null);
-    // In a real app, you would save the data to the server here
-  };
-
-  // Handle vehicle selection
-  const handleVehicleSelect = (vehicleId) => {
-    setSelectedVehicleId(vehicleId);
-    setEditing(true); // Enable editing when selecting a vehicle
-  };
-
-  // Handle setting active vehicle
-  const handleSetActiveVehicle = (vehicleId) => {
-    setActiveVehicleId(vehicleId);
-  };
-
-  // Handle vehicle delete
-  const handleDeleteVehicle = (vehicleId) => {
-    setVehicles(vehicles.filter((v) => v.id !== vehicleId));
-    if (selectedVehicleId === vehicleId) {
-      setSelectedVehicleId(null);
-    }
-    if (activeVehicleId === vehicleId) {
-      setActiveVehicleId(vehicles.find((v) => v.id !== vehicleId)?.id || null);
-    }
-  };
-
-  // Handle vehicle update
-  const handleVehicleUpdate = (updatedVehicle) => {
-    if (selectedVehicleId) {
-      // Update existing vehicle
-      setVehicles(
-        vehicles.map((v) => (v.id === selectedVehicleId ? updatedVehicle : v))
-      );
-    } else {
-      // Add new vehicle with generated ID
-      const newVehicle = {
-        ...updatedVehicle,
-        id: `VH-${String(vehicles.length + 1).padStart(3, "0")}`,
-      };
-      setVehicles([...vehicles, newVehicle]);
-      setSelectedVehicleId(newVehicle.id);
-    }
-  };
-
-  // Add new vehicle
   const handleAddVehicle = () => {
-    setSelectedVehicleId(null); // Set to null to indicate new vehicle
+    setSelectedVehicleId(null);
     setEditing(true);
   };
 
@@ -237,14 +120,8 @@ export default function Profile() {
               )}
             </ProfileHeader>
 
-            <form onSubmit={handleSubmit}>
-              {activeTab === "driver" && (
-                <DriverForm
-                  driverProfile={driverProfile}
-                  editing={editing}
-                  onChange={setDriverProfile}
-                />
-              )}
+            <>
+              {activeTab === "driver" && <DriverForm />}
 
               {activeTab === "carrier" && (
                 <CarrierForm
@@ -258,23 +135,14 @@ export default function Profile() {
                 selectedVehicleId === null &&
                 !editing && (
                   <VehicleList
-                    vehicles={vehicles}
-                    onSelect={handleVehicleSelect}
-                    onSetActive={handleSetActiveVehicle}
-                    onDelete={handleDeleteVehicle}
-                    activeVehicleId={activeVehicleId}
                   />
                 )}
 
               {activeTab === "vehicle" &&
                 (selectedVehicleId !== null || editing) && (
-                  <VehicleForm
-                    vehicle={getSelectedVehicle()}
-                    editing={editing}
-                    onChange={handleVehicleUpdate}
-                  />
+                  <VehicleForm setEditing={setEditing} />
                 )}
-            </form>
+            </>
           </ProfileContent>
         </RightSection>
       </ContentWrapper>

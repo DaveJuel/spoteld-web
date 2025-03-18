@@ -1,14 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { FaEdit, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
+import { makeApiRequest } from "../../utils/RequestHandler";
 
-const VehicleList = ({ vehicles, onSelect, onSetActive, onDelete, activeVehicleId }) => {
+const VehicleList = () => {
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const response = await makeApiRequest("/api/vehicle/all", "GET", null);
+        setVehicles(response.vehicles || []);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch vehicles.");
+        setLoading(false);
+      }
+    };
+
+    fetchVehicles();
+  }, []);
+
+  if (loading) return <div>Loading vehicles...</div>;
+  if (error) return <div>{error}</div>;
+
   return (
     <VehicleListContainer>
-      <VehicleListHeader>
-        <h3>Vehicles</h3>
-      </VehicleListHeader>
-      
       {vehicles.length === 0 ? (
         <NoVehicles>No vehicles added yet</NoVehicles>
       ) : (
@@ -16,54 +34,23 @@ const VehicleList = ({ vehicles, onSelect, onSetActive, onDelete, activeVehicleI
           <thead>
             <tr>
               <th>ID</th>
-              <th>Make/Model</th>
-              <th>Year</th>
+              <th>Make</th>
+              <th>Model</th>
+              <th>License Plate</th>
               <th>Status</th>
-              <th>Active</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {vehicles.map(vehicle => (
-              <tr key={vehicle.id} className={vehicle.id === activeVehicleId ? 'active-row' : ''}>
-                <td>{vehicle.id}</td>
-                <td>{vehicle.make} {vehicle.model}</td>
-                <td>{vehicle.year}</td>
+              <tr key={vehicle.id}>
+                <td>{vehicle.id || 'N/A'}</td>
+                <td>{vehicle.make || 'N/A'}</td>
+                <td>{vehicle.model || 'N/A'}</td>
+                <td>{vehicle.license_plate || 'N/A'}</td>
                 <td>
                   <StatusBadge status={vehicle.status}>
-                    {vehicle.status.charAt(0).toUpperCase() + vehicle.status.slice(1)}
+                    {vehicle.status ? vehicle.status.charAt(0).toUpperCase() + vehicle.status.slice(1) : 'Unknown'}
                   </StatusBadge>
-                </td>
-                <td className="center">
-                  {vehicle.id === activeVehicleId ? <FaCheck color="green" /> : <FaTimes color="#999" />}
-                </td>
-                <td>
-                  <ActionButtons>
-                    <ActionButton
-                      onClick={() => onSelect(vehicle.id)}
-                      title="Edit vehicle"
-                    >
-                      <FaEdit />
-                    </ActionButton>
-                    
-                    {vehicle.id !== activeVehicleId && (
-                      <ActionButton
-                        onClick={() => onSetActive(vehicle.id)}
-                        className="activate"
-                        title="Set as active vehicle"
-                      >
-                        <FaCheck />
-                      </ActionButton>
-                    )}
-                    
-                    <ActionButton
-                      onClick={() => onDelete(vehicle.id)}
-                      className="delete"
-                      title="Delete vehicle"
-                    >
-                      <FaTrash />
-                    </ActionButton>
-                  </ActionButtons>
                 </td>
               </tr>
             ))}
@@ -83,15 +70,6 @@ const VehicleListContainer = styled.div`
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 `;
 
-const VehicleListHeader = styled.div`
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
-  
-  h3 {
-    margin: 0;
-    color: #333;
-  }
-`;
 
 const NoVehicles = styled.div`
   padding: 20px;
@@ -102,23 +80,23 @@ const NoVehicles = styled.div`
 const VehicleTable = styled.table`
   width: 100%;
   border-collapse: collapse;
-  
+
   th, td {
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #eee;
   }
-  
+
   th {
     font-weight: 600;
     color: #333;
     background-color: #f9f9f9;
   }
-  
+
   .center {
     text-align: center;
   }
-  
+
   .active-row {
     background-color: #f0f7ff;
   }
@@ -146,37 +124,4 @@ const StatusBadge = styled.span`
       default: return '#757575';
     }
   }};
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 5px;
-`;
-
-const ActionButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;
-  color: #555;
-  border: none;
-  border-radius: 4px;
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-  transition: all 0.2s;
-  
-  &:hover {
-    background: #e0e0e0;
-  }
-  
-  &.delete:hover {
-    background: #ffebee;
-    color: #d32f2f;
-  }
-  
-  &.activate:hover {
-    background: #e8f5e9;
-    color: #2e7d32;
-  }
 `;
