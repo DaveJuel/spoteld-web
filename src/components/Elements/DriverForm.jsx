@@ -3,11 +3,10 @@ import styled from "styled-components";
 import { makeApiRequest } from "../../utils/RequestHandler";
 import LoadingSpinner from "../Elements/LoadingSpinner";
 
-const DriverForm = () => {
+const DriverForm = ({editing, setEditing}) => {
   const [driverProfile, setDriverProfile] = useState(null);
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
   const [isNewProfile, setIsNewProfile] = useState(true);
   const statuses = ["off duty", "sleeper berth", "driving", "on duty"];
 
@@ -35,8 +34,6 @@ const DriverForm = () => {
         setLoading(false);
       }
     };
-
-    setEditing(true);
     fetchDriverProfile();
     fetchVehicles();
   }, []);
@@ -52,8 +49,9 @@ const DriverForm = () => {
       if(isNewProfile) {
         await makeApiRequest("/api/driver/", "POST", driverProfile);
       }else{
-        await makeApiRequest(`/api/driver/${driverProfile.id}/edit`, "PATCH", driverProfile);
+        await makeApiRequest(`/api/driver/edit/`, "PATCH", driverProfile);
       }
+      setEditing(false);
       alert("Profile updated successfully!");
     } catch (error) {
       console.error("Failed to update profile:", error);
@@ -133,7 +131,6 @@ const SelectBox = styled.select`
   width: 97%;
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 8px;
   font-size: 14px;
   outline: none;
   transition: border 0.3s;
@@ -147,7 +144,6 @@ const SubmitButton = styled.button`
   background-color: #4caf50;
   color: white;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
   &:hover {

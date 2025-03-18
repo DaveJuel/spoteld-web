@@ -93,10 +93,9 @@ const Label = styled.label`
 `;
 
 const Input = styled.input`
-  width: 100%;
+  width: 97%;
   padding: 10px;
   border: 1px solid ${(props) => (props.disabled ? "#ddd" : "#ccc")};
-  border-radius: 4px;
   background: ${(props) => (props.disabled ? "#f9f9f9" : "white")};
 `;
 
@@ -106,7 +105,6 @@ const SubmitButton = styled.button`
   background-color: #2c3e50;
   color: white;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
   &:disabled {
     background-color: #aaa;

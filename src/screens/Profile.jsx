@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import SidebarNav from "../components/Nav/Sidebar";
-import { FaUser, FaTruck, FaEdit, FaSave, FaCar, FaPlus } from "react-icons/fa";
+import { FaUser, FaTruck, FaEdit, FaSave, FaCar, FaPlus, FaList } from "react-icons/fa";
 
 // Import new components
 import DriverForm from "../components/Elements/DriverForm";
@@ -35,19 +35,14 @@ export default function Profile() {
     insurancePolicy: "INS-789012345",
     insuranceExpiry: "2026-03-30",
   });
-  
-  // Toggle edit mode
+
   const toggleEdit = () => {
     setEditing(!editing);
-    // Reset vehicle selection when toggling edit mode
-    if (editing) {
-      setSelectedVehicleId(null);
-    }
   };
 
   const handleAddVehicle = () => {
     setSelectedVehicleId(null);
-    setEditing(true);
+    setEditing(!editing);
   };
 
   return (
@@ -115,13 +110,14 @@ export default function Profile() {
                 </ActionButton>
               ) : (
                 <ActionButton onClick={handleAddVehicle}>
-                  <FaPlus /> Add Vehicle
+                  {!editing ? <FaPlus />: <FaList />}
+                  {!editing ? "Add Vehicle":"Saved Vehicles"}
                 </ActionButton>
               )}
             </ProfileHeader>
 
             <>
-              {activeTab === "driver" && <DriverForm />}
+              {activeTab === "driver" && <DriverForm editing={editing} setEditing={setEditing} />}
 
               {activeTab === "carrier" && (
                 <CarrierForm
@@ -230,7 +226,6 @@ const RightSection = styled.div`
 
 const ProfileContent = styled.div`
   background: white;
-  border-radius: 8px;
   padding: 25px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 `;
@@ -253,7 +248,6 @@ const ActionButton = styled.button`
   background: #2c3e50;
   color: white;
   border: none;
-  border-radius: 4px;
   padding: 8px 16px;
   font-size: 14px;
   cursor: pointer;
