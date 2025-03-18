@@ -1,5 +1,19 @@
 import React, { useState } from "react";
-import styled from "styled-components";
+import {
+  MainContainer,
+  ContentWrapper,
+  LeftSection,
+  RightSection,
+  ActionButton,
+  NavTabs,
+  NavTab,
+} from "../style/view.styles";
+import {
+  ProfileNav,
+  ProfileNavHeader,
+  ProfileContent,
+  ProfileHeader,
+} from "../style/profile.styles";
 import SidebarNav from "../components/Nav/Sidebar";
 import {
   FaUser,
@@ -10,7 +24,6 @@ import {
   FaList,
 } from "react-icons/fa";
 
-// Import new components
 import DriverForm from "../components/Elements/DriverForm";
 import VehicleForm from "../components/Elements/VehicleForm";
 import VehicleList from "../components/Elements/VehicleList";
@@ -18,7 +31,7 @@ import VehicleList from "../components/Elements/VehicleList";
 export default function Profile() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarWidth, setSidebarWidth] = useState(240);
-  const [activeTab, setActiveTab] = useState("driver");
+  const [activeTab, setActiveTab] = useState("vehicle");
   const [editing, setEditing] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState(null);
 
@@ -118,119 +131,3 @@ export default function Profile() {
     </MainContainer>
   );
 }
-
-const MainContainer = styled.div`
-  display: flex;
-  height: 100vh;
-  background: #f0f4f8;
-  overflow: hidden;
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  height: 100%;
-  padding: 0;
-  gap: 20px;
-  transition: all 0.3s ease;
-  margin-left: 0;
-`;
-
-const LeftSection = styled.div`
-  flex: 0 0 250px;
-  height: 100%;
-  border-right: 1px solid #ddd;
-  background: white;
-`;
-
-const ProfileNav = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-`;
-
-const ProfileNavHeader = styled.div`
-  padding: 20px;
-  border-bottom: 1px solid #eee;
-
-  h2 {
-    margin: 0;
-    color: #333;
-  }
-`;
-
-const NavTabs = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 20px 0;
-`;
-
-const NavTab = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: ${(props) => (props.active ? "#f0f7ff" : "transparent")};
-  border-left: 3px solid
-    ${(props) => (props.active ? "#2c3e50" : "transparent")};
-
-  &:hover {
-    background: ${(props) => (props.active ? "#f0f7ff" : "#f5f5f5")};
-  }
-
-  span {
-    margin-left: 10px;
-    font-size: 15px;
-    color: ${(props) => (props.active ? "#2c3e50" : "#666")};
-  }
-
-  svg {
-    color: ${(props) => (props.active ? "#2c3e50" : "#666")};
-  }
-`;
-
-const RightSection = styled.div`
-  flex: 1;
-  height: 100%;
-  overflow-y: auto;
-  padding: 20px;
-`;
-
-const ProfileContent = styled.div`
-  background: white;
-  padding: 25px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-`;
-
-const ProfileHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-
-  h1 {
-    margin: 0;
-    color: #333;
-  }
-`;
-
-const ActionButton = styled.button`
-  display: flex;
-  align-items: center;
-  background: #2c3e50;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  &:hover {
-    background: #34495e;
-  }
-
-  svg {
-    margin-right: 5px;
-  }
-`;
