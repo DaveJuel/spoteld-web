@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContainer from "../components/Elements/AuthContainer";
 import AuthForm from "../components/Elements/AuthForm";
+import { loginUser } from "../utils/AuthHandler";
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -18,30 +19,11 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setMessage("");
-
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/auth/login/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        // Save the login token for further requests
-        localStorage.setItem("loginToken", result.token);
-        
-        // Redirect to routes page
+      if (loginUser(formData.email, formData.password)) {
         navigate("/routes");
       } else {
-        setMessage(result.message || "Login failed. Please try again.");
+        setMessage("Login failed. Please try again.");
       }
     } catch (error) {
       console.error("Error during login:", error);

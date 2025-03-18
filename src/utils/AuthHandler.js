@@ -1,16 +1,15 @@
-import { apiKey, makeApiRequest } from "./RequestHandler";
+import { makeApiRequest } from "./RequestHandler";
 
 export const loginUser = async (username, password) => {
     let isLoggedIn = false;
     try{
         const request = {
-            api_key: apiKey,
-            username,
+            email: username,
             password
         };
-        const response = await makeApiRequest(`/user/login`, 'POST',request);
-        if(response.success){
-            localStorage.setItem("user", JSON.stringify(response.result));
+        const response = await makeApiRequest(`/api/auth/login/`, 'POST',request);
+        if(response.token){
+            localStorage.setItem("loginToken", response.token);
             isLoggedIn = true;
         }else{
             console.error('Something went wrong on login: Response below >>');
