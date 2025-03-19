@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import {
-  FormContainer,
-  ActionButton,
   LocationFieldset,
   Form,
   LabelRow,
@@ -12,10 +10,8 @@ import {
   Strong,
   StyledMapPin,
   DetailsToggle,
-  StyledInput
+  StyledInput,
 } from "../../style/view.styles";
-
-
 
 const ChevronDownIcon = (props) => (
   <svg
@@ -122,55 +118,47 @@ export default function TripDetailsForm({
   };
 
   return (
-    <FormContainer>
-      <Form onSubmit={handleSubmit}>
-        {["currentLocation", "pickUpLocation", "dropOffLocation"].map(
-          (field) => (
-            <LocationFieldset key={field}>
-              <LabelRow>
-                {getIcon(field)}
-                <Label>
-                  {field === "currentLocation"
-                    ? "Current Location"
-                    : field === "pickUpLocation"
-                    ? "Pick Up Location"
-                    : "Drop Off Location"}
-                </Label>
-                <DetailsToggle onClick={() => toggleDetails(field)}>
-                  {expandedFields[field] ? (
-                    <ChevronUpIcon size={18} />
-                  ) : (
-                    <ChevronDownIcon size={18} />
-                  )}
-                </DetailsToggle>
-              </LabelRow>
+    <Form onSubmit={handleSubmit}>
+      {["currentLocation", "pickUpLocation", "dropOffLocation"].map((field) => (
+        <LocationFieldset key={field}>
+          <LabelRow>
+            {getIcon(field)}
+            <Label>
+              {field === "currentLocation"
+                ? "Current Location"
+                : field === "pickUpLocation"
+                ? "Pick Up Location"
+                : "Drop Off Location"}
+            </Label>
+            <DetailsToggle onClick={() => toggleDetails(field)}>
+              {expandedFields[field] ? (
+                <ChevronUpIcon size={18} />
+              ) : (
+                <ChevronDownIcon size={18} />
+              )}
+            </DetailsToggle>
+          </LabelRow>
 
-              <InputWrapper>
-                <StyledInput
-                  type="text"
-                  name={field}
-                  placeholder={`Enter ${
-                    field === "currentLocation"
-                      ? "current"
-                      : field === "pickUpLocation"
-                      ? "pick-up"
-                      : "drop-off"
-                  } location`}
-                  value={formData[field]?.address_line || ""}
-                  onClick={() => handleClick(field)}
-                  onChange={handleChange}
-                />
-              </InputWrapper>
+          <InputWrapper>
+            <StyledInput
+              type="text"
+              name={field}
+              placeholder={`Enter ${
+                field === "currentLocation"
+                  ? "current"
+                  : field === "pickUpLocation"
+                  ? "pick-up"
+                  : "drop-off"
+              } location`}
+              value={formData[field]?.address_line || ""}
+              onClick={() => handleClick(field)}
+              onChange={handleChange}
+            />
+          </InputWrapper>
 
-              {renderLocationDetails(formData[field], field)}
-            </LocationFieldset>
-          )
-        )}
-
-        <ActionButton type="submit">
-          <span>Confirm Trip Details</span>
-        </ActionButton>
-      </Form>
-    </FormContainer>
+          {renderLocationDetails(formData[field], field)}
+        </LocationFieldset>
+      ))}
+    </Form>
   );
 }

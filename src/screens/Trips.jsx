@@ -102,12 +102,11 @@ export default function Trips() {
   const leftContent = (
     <LeftSectionContainer >
       <LeftSectionHeader >
-        <h2>My Trips</h2>
+        <h2>Saved Trips</h2>
         <FilterContainer>
           <select defaultValue="all">
             <option value="all">All Trips</option>
             <option value="completed">Completed</option>
-            <option value="in-progress">In Progress</option>
             <option value="scheduled">Scheduled</option>
           </select>
         </FilterContainer>
