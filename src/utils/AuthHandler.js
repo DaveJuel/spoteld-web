@@ -1,4 +1,4 @@
-import { makeApiRequest } from "./RequestHandler";
+import { appUrl } from "./RequestHandler";
 
 export const loginUser = async (username, password) => {
     let isLoggedIn = false;
@@ -7,7 +7,18 @@ export const loginUser = async (username, password) => {
             email: username,
             password
         };
-        const response = await makeApiRequest(`/api/auth/login/`, 'POST',request);
+        const result = await fetch(`${appUrl}/api/auth/login/`, {
+            headers: {
+                "Content-Type": "application/json"
+              },
+            method: "POST", 
+            body: JSON.stringify(request)
+        });
+    
+        if (!result.ok) {
+            throw new Error(`HTTP error! status: ${result.status}`);
+        }
+        const response= await result.json();
         if(response.token){
             localStorage.setItem("loginToken", response.token);
             isLoggedIn = true;
