@@ -20,7 +20,8 @@ export default function Login() {
     setLoading(true);
     setMessage("");
     try {
-      if (loginUser(formData.email, formData.password)) {
+      const isLoggedIn = await loginUser(formData.email, formData.password);
+      if (isLoggedIn) {
         navigate("/routes");
       } else {
         setMessage("Login failed. Please try again.");
