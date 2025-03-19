@@ -78,12 +78,11 @@ export default function TripRoutes() {
           pickup_location: formatLocation(formData.pickUpLocation),
           dropoff_location: formatLocation(formData.dropOffLocation),
         });
-        setTripId(response.data.tripId);
+        setTripId(response.id);
       } catch (error) {
         console.error("Failed to create trip:", error);
       }
     }
-
     if (currentStep === 2 && tripId && !shipmentId) {
       try {
         const method = shipmentId ? "PATCH" : "POST";
@@ -94,7 +93,7 @@ export default function TripRoutes() {
         const response = await makeApiRequest(endpoint, method, {
           ...formData.shipmentDetails,
         });
-        setShipmentId(response.data.shipmentId);
+        setShipmentId(response.id);
       } catch (error) {
         console.error("Failed to create or update shipment:", error);
       }

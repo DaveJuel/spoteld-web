@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Form,
   LabelRow,
@@ -7,7 +7,26 @@ import {
   LocationFieldset,
 } from "../../style/view.styles";
 
+const generateShipmentNo = () => {
+  // Generate a random 8-digit alphanumeric string
+  return Math.random().toString(36).substring(2, 10).toUpperCase();
+};
+
 const TripShipmentForm = ({ formData, setFormData }) => {
+  useEffect(() => {
+    // Generate shipment_no if it doesn't already exist
+    if (!formData.shipmentDetails?.shipment_no) {
+      const shipmentNo = generateShipmentNo();
+      setFormData((prevData) => ({
+        ...prevData,
+        shipmentDetails: {
+          ...prevData.shipmentDetails,
+          shipment_no: shipmentNo,
+        },
+      }));
+    }
+  }, [formData, setFormData]);
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -36,27 +55,27 @@ const TripShipmentForm = ({ formData, setFormData }) => {
 
       <LocationFieldset>
         <LabelRow>
-          <Label htmlFor="weight">Weight (kg):</Label>
+          <Label htmlFor="load_size">Size :</Label>
         </LabelRow>
         <StyledInput
           type="number"
-          name="weight"
-          value={formData.shipmentDetails.weight || ""}
+          name="load_size"
+          value={formData.shipmentDetails.load_size || ""}
           onChange={handleInputChange}
-          placeholder="Enter weight"
+          placeholder="Enter size"
         />
       </LocationFieldset>
 
       <LocationFieldset>
         <LabelRow>
-          <Label htmlFor="quantity">Quantity:</Label>
+          <Label htmlFor="load_unit">Measured In (kg, lb, ton):</Label>
         </LabelRow>
         <StyledInput
-          type="number"
-          name="quantity"
-          value={formData.shipmentDetails.quantity || ""}
+          type="text"
+          name="load_unit"
+          value={formData.shipmentDetails.load_unit || ""}
           onChange={handleInputChange}
-          placeholder="Enter quantity"
+          placeholder="Enter measurement unit"
         />
       </LocationFieldset>
     </Form>
