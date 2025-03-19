@@ -19,14 +19,20 @@ import { ButtonsContainer, StepHint } from "../style/route.styles";
 import { makeApiRequest } from "../utils/RequestHandler";
 import LoadingSpinner from "../components/Elements/LoadingSpinner";
 
+const truncateToNineDigits = (number) => {
+  if (typeof number !== "number") return 0;
+  return Number(number.toFixed(6));
+};
+
 const formatLocation = (location) => {
+  console.log(location)
   if (!location) return null;
   return {
     address_line: location.address || "Unknown Street",
     city: location.city || "Unknown City",
     country: location.country || "Unknown Country",
-    longitude: location.lng || 0,
-    latitude: location.lat || 0,
+    longitude: truncateToNineDigits(location.longitude || 0),
+    latitude: truncateToNineDigits(location.latitude || 0),
   };
 };
 
