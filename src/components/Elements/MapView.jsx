@@ -4,52 +4,13 @@ import {
   TileLayer,
   Marker,
   Polyline,
-  useMapEvents,
   Tooltip,
 } from "react-leaflet";
-import styled from "styled-components";
 import L from "leaflet";
+import { fetchRoute, HandleMapClick } from "../../utils/MapDecoder";
+import { MapWrapper, RouteColorIndicator, RouteInfo, RouteItem, TotalInfo } from "../../style/map.styles";
 
-const decodePolyline = (encoded) => {
-  if (!encoded) return [];
-  
-  const points = [];
-  let index = 0;
-  const len = encoded.length;
-  let lat = 0;
-  let lng = 0;
 
-  while (index < len) {
-    let b;
-    let shift = 0;
-    let result = 0;
-    
-    do {
-      b = encoded.charCodeAt(index++) - 63;
-      result |= (b & 0x1f) << shift;
-      shift += 5;
-    } while (b >= 0x20);
-    
-    const dlat = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
-    lat += dlat;
-
-    shift = 0;
-    result = 0;
-    
-    do {
-      b = encoded.charCodeAt(index++) - 63;
-      result |= (b & 0x1f) << shift;
-      shift += 5;
-    } while (b >= 0x20);
-    
-    const dlng = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
-    lng += dlng;
-
-    points.push([lat * 1e-5, lng * 1e-5]);
-  }
-
-  return points;
-};
 
 // Custom marker icons
 const markerIcons = {
@@ -73,95 +34,18 @@ const markerIcons = {
   })
 };
 
-const isValidCountryCode = (code) => /^[A-Z]{2}$/.test(code);
+
 
 export default function MapView({ formData, onMapClick }) {
   const [routes, setRoutes] = useState([]);
 
-  const HandleMapClick = () => {
-    useMapEvents({
-      click: async (e) => {
-        if (!e.latlng) return;
-
-        const { lat, lng } = e.latlng;
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-          );
-
-          if (!response.ok) throw new Error("Failed to fetch location details");
-
-          const data = await response.json();
-
-          const countryCode = data.address.country_code?.toUpperCase() || "US";
-          const validCountry = isValidCountryCode(countryCode) ? countryCode : "US";
-  
-
-          const location = {
-            address_line:
-              data.address.road || data.display_name || "Unknown Road",
-            city:
-              data.address.city ||
-              data.address.town ||
-              data.address.village ||
-              "Unknown City",
-            country: validCountry || "Unknown Country",
-            longitude: lng,
-            latitude: lat,
-          };
-
-          onMapClick(location);
-        } catch (error) {
-          console.error("Error fetching location details:", error);
-        }
-      },
-    });
-    return null;
-  };
-
-  const fetchRoute = async (start, end) => {
-    if (!start || !end) {
-      return { coordinates: [], distance: 0, duration: 0 };
-    }
-    try {
-      const response = await fetch(
-        `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${process.env.REACT_APP_ORS_API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            coordinates: [
-              [start.longitude, start.latitude],
-              [end.longitude, end.latitude],
-            ],
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (data && data.routes && data.routes.length > 0) {
-        const encodedPolyline = data.routes[0].geometry;
-        const decodedRoute = decodePolyline(encodedPolyline);
-        const summary = data.routes[0].summary || {};
-        return {
-          coordinates: decodedRoute,
-          distance: summary.distance, // in meters
-          duration: summary.duration  // in seconds
-        };
-      }
-    } catch (error) {
-      console.error("Error fetching route:", error);
-    }
-    return { coordinates: [], distance: 0, duration: 0 };
-  };
 
   useEffect(() => {
     const getRoutes = async () => {
       let newRoutes = [];
       
       if (formData.currentLocation && formData.pickUpLocation) {
-        const route1Data = await fetchRoute(
+        const route1Data = await fetchRoute (
           formData.currentLocation,
           formData.pickUpLocation
         );
@@ -170,7 +54,7 @@ export default function MapView({ formData, onMapClick }) {
           newRoutes.push({
             ...route1Data,
             type: 'toPickUp',
-            color: "#3388ff", // Blue for current to pickup
+            color: "#3388ff",
             weight: 4,
             opacity: 0.8,
             label: "Route to pickup location"
@@ -264,7 +148,7 @@ export default function MapView({ formData, onMapClick }) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
-        <HandleMapClick />
+        <HandleMapClick onMapClick={onMapClick} />
 
         {markers.map((marker, index) => (
           <Marker
@@ -298,7 +182,7 @@ export default function MapView({ formData, onMapClick }) {
       </MapContainer>
       
       {routes.length > 0 && (
-        <RouteInfo>
+        <RouteInfo >
           <h3>Trip Information</h3>
           {routes.map((route, index) => (
             <RouteItem key={`info-${route.type}-${index}`}>
@@ -311,7 +195,7 @@ export default function MapView({ formData, onMapClick }) {
               </div>
             </RouteItem>
           ))}
-          <TotalInfo>
+          <TotalInfo >
             Total: {formatDistance(routes.reduce((sum, route) => sum + route.distance, 0))} | {" "}
             {formatTime(routes.reduce((sum, route) => sum + route.duration, 0))}
           </TotalInfo>
@@ -320,53 +204,3 @@ export default function MapView({ formData, onMapClick }) {
     </MapWrapper>
   );
 }
-
-const MapWrapper = styled.div`
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-`;
-
-const RouteInfo = styled.div`
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  background: white;
-  padding: 10px 15px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-  max-width: 300px;
-  z-index: 1000;
-  
-  h3 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 16px;
-  }
-`;
-
-const RouteItem = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  
-  .route-stats {
-    font-size: 12px;
-    color: #666;
-  }
-`;
-
-const RouteColorIndicator = styled.div`
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: ${props => props.color};
-  margin-right: 8px;
-`;
-
-const TotalInfo = styled.div`
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #eee;
-  font-weight: bold;
-`;

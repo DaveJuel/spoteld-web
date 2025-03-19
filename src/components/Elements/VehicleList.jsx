@@ -12,9 +12,9 @@ const VehicleList = () => {
       try {
         const response = await makeApiRequest("/api/vehicle/all", "GET", null);
         setVehicles(response.vehicles || []);
-        setLoading(false);
       } catch (err) {
         setError("Failed to fetch vehicles.");
+      }finally{
         setLoading(false);
       }
     };

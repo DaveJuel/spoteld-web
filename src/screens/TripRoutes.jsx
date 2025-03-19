@@ -25,10 +25,9 @@ const truncateToNineDigits = (number) => {
 };
 
 const formatLocation = (location) => {
-  console.log(location)
   if (!location) return null;
   return {
-    address_line: location.address || "Unknown Street",
+    address_line: location.address_line || "Unknown Street",
     city: location.city || "Unknown City",
     country: location.country || "Unknown Country",
     longitude: truncateToNineDigits(location.longitude || 0),
@@ -50,6 +49,7 @@ export default function TripRoutes() {
   const [shipmentId, setShipmentId] = useState(null);
   const [driver, setDriver] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isNextDisabled, setIsNextDisabled] = useState(true);
 
   useEffect(() => {
     const fetchDriver = async () => {
@@ -57,7 +57,7 @@ export default function TripRoutes() {
         const driver = await makeApiRequest("/api/driver/user/", "GET", null);
         if (driver) setDriver(driver);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -72,6 +72,12 @@ export default function TripRoutes() {
         [selectedField]: location,
       }));
     }
+    if (
+      formData.currentLocation &&
+      formData.pickUpLocation &&
+      selectedField === "dropOffLocation"
+    )
+      setIsNextDisabled(false);
   };
 
   const handleNext = async () => {
@@ -85,6 +91,7 @@ export default function TripRoutes() {
           dropoff_location: formatLocation(formData.dropOffLocation),
         });
         setTripId(response.id);
+        setIsNextDisabled(true);
       } catch (error) {
         console.error("Failed to create trip:", error);
       }
@@ -100,6 +107,7 @@ export default function TripRoutes() {
           ...formData.shipmentDetails,
         });
         setShipmentId(response.id);
+        setIsNextDisabled(true);
       } catch (error) {
         console.error("Failed to create or update shipment:", error);
       }
@@ -110,8 +118,8 @@ export default function TripRoutes() {
         await makeApiRequest(`/api/trip/${tripId}/edit/`, "PATCH", {
           start_time: formData.schedulingDetails.startTime,
           start_date: formData.schedulingDetails.startDate,
+          shipment: shipmentId,
         });
-        alert("Trip successfully scheduled!");
       } catch (error) {
         console.error("Failed to update trip:", error);
       }
@@ -120,7 +128,10 @@ export default function TripRoutes() {
     setCurrentStep((prev) => Math.min(prev + 1, 3));
   };
 
-  const handlePrevious = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const handlePrevious = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+    setIsNextDisabled(false);
+  };
 
   const getStepHint = () => {
     switch (currentStep) {
@@ -147,15 +158,18 @@ export default function TripRoutes() {
         {currentStep === 1 && (
           <TripDetailsForm
             formData={formData}
-            setFormData={setFormData}
             setSelectedField={setSelectedField}
           />
         )}
         {currentStep === 2 && (
-          <TripShipmentForm formData={formData} setFormData={setFormData} />
+          <TripShipmentForm
+            formData={formData}
+            setFormData={setFormData}
+            setIsNextDisabled={setIsNextDisabled}
+          />
         )}
         {currentStep === 3 && (
-          <TripSchedulingForm formData={formData} setFormData={setFormData} />
+          <TripSchedulingForm formData={formData} setFormData={setFormData} setIsNextDisabled={setIsNextDisabled} />
         )}
 
         <ButtonsContainer>
@@ -165,13 +179,18 @@ export default function TripRoutes() {
             </ActionButton>
           )}
           {currentStep < 3 ? (
-            <ActionButton className="next" onClick={handleNext}>
+            <ActionButton
+              className="next"
+              disabled={isNextDisabled}
+              onClick={handleNext}
+            >
               <AiOutlineArrowRight style={{ marginLeft: "5px" }} />
             </ActionButton>
           ) : (
             <ActionButton
               className="confirm"
               type="submit"
+              disabled={isNextDisabled}
               onClick={handleNext}
             >
               <AiOutlineCheckCircle style={{ marginRight: "5px" }} />

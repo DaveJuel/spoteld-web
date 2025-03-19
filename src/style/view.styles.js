@@ -78,20 +78,21 @@ export const FormContainer = styled.div`
 export const ActionButton = styled.button`
   display: flex;
   align-items: center;
-  background: #2c3e50;
-  color: white;
+  background: ${({ disabled }) => (disabled ? "#bdc3c7" : "#2c3e50")};
+  color: ${({ disabled }) => (disabled ? "#7f8c8d" : "white")};
   border: none;
   padding: 8px 16px;
   font-size: 14px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   transition: background 0.2s;
 
   &:hover {
-    background: #34495e;
+    background: ${({ disabled }) => (disabled ? "#bdc3c7" : "#34495e")};
   }
 
   svg {
     margin-right: 5px;
+    fill: ${({ disabled }) => (disabled ? "#7f8c8d" : "white")};
   }
 `;
 
@@ -131,6 +132,7 @@ export const LocationFieldset = styled.div`
   flex-direction: column;
   border: 1px solid #e0e0e0;
   padding: 10px 12px;
+  margin-bottom: 20px;
   transition: all 0.2s ease;
 
   &:focus-within {

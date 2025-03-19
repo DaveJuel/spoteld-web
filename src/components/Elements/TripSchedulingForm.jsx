@@ -7,7 +7,7 @@ import {
   LocationFieldset,
 } from "../../style/view.styles";
 
-const TripSchedulingForm = ({ formData, setFormData }) => {
+const TripSchedulingForm = ({ formData, setFormData, setIsNextDisabled }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -17,6 +17,13 @@ const TripSchedulingForm = ({ formData, setFormData }) => {
         [name]: value,
       },
     }));
+    console.log(formData.schedulingDetails);
+    if (
+      formData.schedulingDetails &&
+      formData.schedulingDetails.startDate &&
+      formData.schedulingDetails.startTime
+    )
+      setIsNextDisabled(false);
   };
 
   return (

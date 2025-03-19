@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   LocationFieldset,
-  Form,
   LabelRow,
   Label,
   InputWrapper,
@@ -47,29 +46,12 @@ const ChevronUpIcon = (props) => (
   </svg>
 );
 
-export default function TripDetailsForm({
-  formData,
-  setFormData,
-  setSelectedField,
-}) {
+export default function TripDetailsForm({ formData, setSelectedField }) {
   const [expandedFields, setExpandedFields] = useState({
     currentLocation: false,
     pickUpLocation: false,
     dropOffLocation: false,
   });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: { ...formData[name], address_line: value },
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form Data Submitted:", formData);
-  };
 
   const handleClick = (field) => {
     setSelectedField(field);
@@ -118,7 +100,7 @@ export default function TripDetailsForm({
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <>
       {["currentLocation", "pickUpLocation", "dropOffLocation"].map((field) => (
         <LocationFieldset key={field}>
           <LabelRow>
@@ -143,22 +125,21 @@ export default function TripDetailsForm({
             <StyledInput
               type="text"
               name={field}
-              placeholder={`Enter ${
+              placeholder={`Select ${
                 field === "currentLocation"
                   ? "current"
                   : field === "pickUpLocation"
                   ? "pick-up"
                   : "drop-off"
-              } location`}
+              } location on the map.`}
               value={formData[field]?.address_line || ""}
               onClick={() => handleClick(field)}
-              onChange={handleChange}
             />
           </InputWrapper>
 
           {renderLocationDetails(formData[field], field)}
         </LocationFieldset>
       ))}
-    </Form>
+    </>
   );
 }

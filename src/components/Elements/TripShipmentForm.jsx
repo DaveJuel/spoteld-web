@@ -12,7 +12,7 @@ const generateShipmentNo = () => {
   return Math.random().toString(36).substring(2, 10).toUpperCase();
 };
 
-const TripShipmentForm = ({ formData, setFormData }) => {
+const TripShipmentForm = ({ formData, setFormData, setIsNextDisabled }) => {
   useEffect(() => {
     // Generate shipment_no if it doesn't already exist
     if (!formData.shipmentDetails?.shipment_no) {
@@ -26,7 +26,7 @@ const TripShipmentForm = ({ formData, setFormData }) => {
       }));
     }
   }, [formData, setFormData]);
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -36,6 +36,15 @@ const TripShipmentForm = ({ formData, setFormData }) => {
         [name]: value,
       },
     }));
+    if (
+      formData.shipmentDetails &&
+      formData.shipmentDetails.shipment_no &&
+      formData.shipmentDetails.description &&
+      formData.shipmentDetails.load_size &&
+      formData.shipmentDetails.load_unit
+    ) {
+      setIsNextDisabled(false);
+    }
   };
 
   return (
