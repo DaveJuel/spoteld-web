@@ -73,6 +73,8 @@ const markerIcons = {
   })
 };
 
+const isValidCountryCode = (code) => /^[A-Z]{2}$/.test(code);
+
 export default function MapView({ formData, onMapClick }) {
   const [routes, setRoutes] = useState([]);
 
@@ -91,6 +93,10 @@ export default function MapView({ formData, onMapClick }) {
 
           const data = await response.json();
 
+          const countryCode = data.address.country_code?.toUpperCase() || "US";
+          const validCountry = isValidCountryCode(countryCode) ? countryCode : "US";
+  
+
           const location = {
             address_line:
               data.address.road || data.display_name || "Unknown Road",
@@ -99,7 +105,7 @@ export default function MapView({ formData, onMapClick }) {
               data.address.town ||
               data.address.village ||
               "Unknown City",
-            country: data.address.country || "Unknown Country",
+            country: validCountry || "Unknown Country",
             longitude: lng,
             latitude: lat,
           };
