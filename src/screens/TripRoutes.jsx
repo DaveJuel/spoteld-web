@@ -18,6 +18,7 @@ import MainLayout from "../components/Layout/MainLayout";
 import { ButtonsContainer, StepHint } from "../style/route.styles";
 import { makeApiRequest } from "../utils/RequestHandler";
 import LoadingSpinner from "../components/Elements/LoadingSpinner";
+import ConfirmTripForm from "../components/Elements/ConfirmTripForm";
 
 const truncateToNineDigits = (number) => {
   if (typeof number !== "number") return 0;
@@ -125,7 +126,7 @@ export default function TripRoutes() {
       }
     }
 
-    setCurrentStep((prev) => Math.min(prev + 1, 3));
+    setCurrentStep((prev) => Math.min(prev + 1, 4));
   };
 
   const handlePrevious = () => {
@@ -141,6 +142,8 @@ export default function TripRoutes() {
         return "Provide details about your shipment including weight, dimensions, and type";
       case 3:
         return "Schedule your trip by selecting date, time, and any special instructions";
+      case 4:
+        return "Save your trip route";
       default:
         return "";
     }
@@ -171,6 +174,9 @@ export default function TripRoutes() {
         {currentStep === 3 && (
           <TripSchedulingForm formData={formData} setFormData={setFormData} setIsNextDisabled={setIsNextDisabled} />
         )}
+        {currentStep === 4 && (
+          <ConfirmTripForm tripId={tripId} shipmentDetails={formData.shipmentDetails}/>
+        )}
 
         <ButtonsContainer>
           {currentStep > 1 && (
@@ -178,7 +184,7 @@ export default function TripRoutes() {
               <AiOutlineArrowLeft style={{ marginRight: "5px" }} />
             </ActionButton>
           )}
-          {currentStep < 3 ? (
+          {currentStep < 4 ? (
             <ActionButton
               className="next"
               disabled={isNextDisabled}
