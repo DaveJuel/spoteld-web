@@ -36,7 +36,7 @@ const markerIcons = {
 
 
 
-export default function MapView({ formData, onMapClick }) {
+export default function MapView({ mapData, onMapClick }) {
   const [routes, setRoutes] = useState([]);
 
 
@@ -44,10 +44,10 @@ export default function MapView({ formData, onMapClick }) {
     const getRoutes = async () => {
       let newRoutes = [];
       
-      if (formData.currentLocation && formData.pickUpLocation) {
+      if (mapData.currentLocation && mapData.pickUpLocation) {
         const route1Data = await fetchRoute (
-          formData.currentLocation,
-          formData.pickUpLocation
+          mapData.currentLocation,
+          mapData.pickUpLocation
         );
         
         if (route1Data.coordinates.length > 0) {
@@ -62,10 +62,10 @@ export default function MapView({ formData, onMapClick }) {
         }
       }
       
-      if (formData.pickUpLocation && formData.dropOffLocation) {
+      if (mapData.pickUpLocation && mapData.dropOffLocation) {
         const route2Data = await fetchRoute(
-          formData.pickUpLocation,
-          formData.dropOffLocation
+          mapData.pickUpLocation,
+          mapData.dropOffLocation
         );
         
         if (route2Data.coordinates.length > 0) {
@@ -84,7 +84,7 @@ export default function MapView({ formData, onMapClick }) {
     };
     
     getRoutes();
-  }, [formData]);
+  }, [mapData]);
 
   // Format time from seconds to minutes and seconds
   const formatTime = (seconds) => {
@@ -103,27 +103,27 @@ export default function MapView({ formData, onMapClick }) {
 
   // Get marker positions and assign appropriate icons
   const markers = [];
-  if (formData.currentLocation) {
+  if (mapData.currentLocation) {
     markers.push({
-      position: [formData.currentLocation.latitude, formData.currentLocation.longitude],
+      position: [mapData.currentLocation.latitude, mapData.currentLocation.longitude],
       icon: markerIcons.current,
       tooltip: "Current Location",
       type: "current"
     });
   }
   
-  if (formData.pickUpLocation) {
+  if (mapData.pickUpLocation) {
     markers.push({
-      position: [formData.pickUpLocation.latitude, formData.pickUpLocation.longitude],
+      position: [mapData.pickUpLocation.latitude, mapData.pickUpLocation.longitude],
       icon: markerIcons.pickup,
       tooltip: "Pick-up Location",
       type: "pickup"
     });
   }
   
-  if (formData.dropOffLocation) {
+  if (mapData.dropOffLocation) {
     markers.push({
-      position: [formData.dropOffLocation.latitude, formData.dropOffLocation.longitude],
+      position: [mapData.dropOffLocation.latitude, mapData.dropOffLocation.longitude],
       icon: markerIcons.dropoff,
       tooltip: "Drop-off Location",
       type: "dropoff"
@@ -148,7 +148,7 @@ export default function MapView({ formData, onMapClick }) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
-        <HandleMapClick onMapClick={onMapClick} />
+        {onMapClick && <HandleMapClick onMapClick={onMapClick} />}
 
         {markers.map((marker, index) => (
           <Marker

@@ -1,21 +1,9 @@
 import React, { useEffect, useState } from "react";
 // import MapView from "../components/Elements/MapView";
 import MainLayout from "../components/Layout/MainLayout";
-import { MapContainer } from "react-leaflet";
 import {
-  InfoItem,
-  InfoLabel,
-  InfoValue,
   NoSelection,
-  // NotesSection,
-  RouteDetails,
-  RoutePoint,
-  StatusBadge,
   TripDate,
-  TripDetails,
-  // TripDistance,
-  TripHeader,
-  TripInfoGrid,
   TripItem,
   TripName,
   TripStatus,
@@ -27,6 +15,7 @@ import {
 } from "../style/view.styles";
 import LoadingSpinner from "../components/Elements/LoadingSpinner";
 import { makeApiRequest } from "../utils/RequestHandler";
+import TripDetailsView from "../components/Elements/TripDetailsView";
 
 export default function Trips() {
   const [selectedTrip, setSelectedTrip] = useState(null);
@@ -81,57 +70,7 @@ export default function Trips() {
 
   // Create the right content (trip details and map)
   const rightContent = selectedTrip ? (
-    <TripDetails>
-      <TripHeader>
-        <h1>{selectedTrip.name}</h1>
-        <StatusBadge status={selectedTrip.status}>
-          {selectedTrip.status}
-        </StatusBadge>
-      </TripHeader>
-
-      <TripInfoGrid>
-        {/* <InfoItem>
-          <InfoLabel>Date</InfoLabel>
-          <InfoValue>{selectedTrip.date}</InfoValue>
-        </InfoItem>
-        <InfoItem>
-          <InfoLabel>Distance</InfoLabel>
-          <InfoValue>{selectedTrip.distance}</InfoValue>
-        </InfoItem>
-        <InfoItem>
-          <InfoLabel>Duration</InfoLabel>
-          <InfoValue>{selectedTrip.duration}</InfoValue>
-        </InfoItem> */}
-        <InfoItem>
-          <InfoLabel>Driver</InfoLabel>
-          <InfoValue>{selectedTrip.driver}</InfoValue>
-        </InfoItem>
-        <InfoItem>
-          <InfoLabel>Carrier</InfoLabel>
-          <InfoValue>{selectedTrip.carrier}</InfoValue>
-        </InfoItem>
-      </TripInfoGrid>
-
-      <RouteDetails>
-        <h3>Route Details</h3>
-        <RoutePoint type="start">{selectedTrip.pickup_location.address_line}</RoutePoint>
-        {/* {selectedTrip.stops.map((stop, index) => (
-          <RoutePoint key={index} type="stop">
-            {stop}
-          </RoutePoint>
-        ))} */}
-        <RoutePoint type="end">{selectedTrip.dropoff_location.address_line}</RoutePoint>
-      </RouteDetails>
-
-      {/* <NotesSection>
-        <h3>Notes</h3>
-        <p>{selectedTrip.notes}</p>
-      </NotesSection> */}
-
-      <MapContainer>
-        {/* <MapView tripData={selectedTrip} /> */}
-      </MapContainer>
-    </TripDetails>
+    <TripDetailsView trip={selectedTrip} />
   ) : (
     <NoSelection>
       <h2>Select a trip to view details</h2>

@@ -19,6 +19,7 @@ import { ButtonsContainer, StepHint } from "../style/route.styles";
 import { makeApiRequest } from "../utils/RequestHandler";
 import LoadingSpinner from "../components/Elements/LoadingSpinner";
 import ConfirmTripForm from "../components/Elements/ConfirmTripForm";
+import DailyLogLayout from "../components/Elements/DailyLogView";
 
 const truncateToNineDigits = (number) => {
   if (typeof number !== "number") return 0;
@@ -172,10 +173,17 @@ export default function TripRoutes() {
           />
         )}
         {currentStep === 3 && (
-          <TripSchedulingForm formData={formData} setFormData={setFormData} setIsNextDisabled={setIsNextDisabled} />
+          <TripSchedulingForm
+            formData={formData}
+            setFormData={setFormData}
+            setIsNextDisabled={setIsNextDisabled}
+          />
         )}
         {currentStep === 4 && (
-          <ConfirmTripForm tripId={tripId} shipmentDetails={formData.shipmentDetails}/>
+          <ConfirmTripForm
+            tripId={tripId}
+            shipmentDetails={formData.shipmentDetails}
+          />
         )}
 
         <ButtonsContainer>
@@ -208,7 +216,13 @@ export default function TripRoutes() {
   );
 
   const rightContent = (
-    <MapView formData={formData} onMapClick={handleMapClick} />
+    <>
+      {currentStep === 4 ? (
+        <DailyLogLayout tripId={tripId} formData={formData} onMapClick={handleMapClick} />
+      ) : (
+        <MapView mapData={formData} onMapClick={handleMapClick} />
+      )}
+    </>
   );
 
   return (
