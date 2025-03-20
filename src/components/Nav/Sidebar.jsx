@@ -16,6 +16,7 @@ import {
   TooltipLabel,
   NavLabel,
 } from "../../style/sidebar.styles";
+import { logoutUser } from "../../utils/AuthHandler";
 
 const SidebarNav = ({ onStateChange, sidebarOpen }) => {
   const [isOpen, setIsOpen] = useState(sidebarOpen);
@@ -33,7 +34,7 @@ const SidebarNav = ({ onStateChange, sidebarOpen }) => {
   }, [isOpen, onStateChange]);
 
   const handleLogout = () => {
-    window.location.href = "/login";
+    logoutUser()
   };
   const handleOnClickTrips = () => {
     window.location.href = "/trips";
