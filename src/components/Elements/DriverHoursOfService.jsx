@@ -5,7 +5,6 @@ import {
   RemarksHeader,
   RemarksRow,
   RemarksTotal,
-  ShipmentInfo,
   StatusBar,
   StatusLabel,
   StatusRow,
@@ -195,10 +194,6 @@ const DriverHoursOfService = ({ tripId }) => {
 
   return (
     <EldContainer>
-      <ShipmentInfo>
-        <div>Pro or Shipping No. {driverData.pro_shipping_no}</div>
-        <div>Date: {driverData.date}</div>
-      </ShipmentInfo>
       <TimeHeader>{timeHeaders}</TimeHeader>
       <StatusRow>
         <StatusLabel>Off Duty</StatusLabel>

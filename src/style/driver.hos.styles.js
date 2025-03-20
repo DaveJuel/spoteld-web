@@ -96,9 +96,3 @@ export const Location = styled.div`
   align-items: center;
   justify-content: center;
 `;
-
-export const ShipmentInfo = styled.div`
-  display: flex;
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
-`;

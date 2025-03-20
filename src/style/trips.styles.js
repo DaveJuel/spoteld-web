@@ -6,35 +6,94 @@ export const TripItem = styled.div`
   padding: 15px 20px;
   border-bottom: 1px solid #eee;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
   background: ${props => props.isSelected ? '#f0f7ff' : 'white'};
-  
+  border-left: 4px solid ${props => props.isSelected ? '#1976d2' : 'transparent'};
   &:hover {
     background: ${props => props.isSelected ? '#f0f7ff' : '#f5f5f5'};
   }
 `;
 
+export const TripHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
+export const TripId = styled.span`
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  background: #f1f1f1;
+  padding: 3px 8px;
+  border-radius: 4px;
+`;
+
+export const TripRoute = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+`;
+
+export const LocationIcon = styled.div`
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+`;
+
 export const TripName = styled.h3`
-  margin: 0 0 5px 0;
+  margin: 0;
   color: #333;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 500;
 `;
 
-export const TripDate = styled.p`
-  margin: 0 0 5px 0;
-  color: #666;
-  font-size: 14px;
+export const TripInfo = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
 `;
 
-export const TripDistance = styled.p`
-  margin: 0 0 5px 0;
+export const TripDate = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
   color: #666;
-  font-size: 14px;
+  font-size: 13px;
+  
+  svg {
+    margin-right: 4px;
+  }
+`;
+
+export const TripTime = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
+  color: #666;
+  font-size: 13px;
+  
+  svg {
+    margin-right: 4px;
+  }
+`;
+
+export const TripShipment = styled.div`
+  display: flex;
+  align-items: center;
+  color: #666;
+  font-size: 13px;
+  
+  svg {
+    margin-right: 4px;
+  }
 `;
 
 export const TripStatus = styled.span`
   display: inline-block;
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
@@ -63,12 +122,11 @@ export const TripDetails = styled.div`
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 `;
 
-export const TripHeader = styled.div`
+export const TripDetailHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  
   h1 {
     margin: 0;
     color: #333;
