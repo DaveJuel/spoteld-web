@@ -17,7 +17,6 @@ const TripSchedulingForm = ({ formData, setFormData, setIsNextDisabled }) => {
         [name]: value,
       },
     }));
-    console.log(formData.schedulingDetails);
     if (
       formData.schedulingDetails &&
       formData.schedulingDetails.startDate &&

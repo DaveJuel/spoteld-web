@@ -6,6 +6,7 @@ export const EldContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   border: 1px solid #ccc;
+  #eld-container;
 `;
 
 export const TimeHeader = styled.div`
@@ -95,4 +96,44 @@ export const Location = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+export const LogSelectorContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+`;
+
+export const LogSelectorLabel = styled.label`
+  margin-right: 10px;
+  font-weight: bold;
+`;
+
+export const LogSelector = styled.select`
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  min-width: 150px;
+`;
+
+export const DateDisplay = styled.div`
+  margin-left: 20px;
+  font-weight: bold;
+  font-size: 16px;
+`;
+
+export const Dot = styled.div`
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+  top: 20px; /* Adjust as needed to position the dot vertically */
+  z-index: 2;
+  font-size: 18px,
+  font-weight: bold,
 `;

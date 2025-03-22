@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
 import {
+  DateDisplay,
   EldContainer,
   HoursTotal,
+  LogSelector,
+  LogSelectorContainer,
+  LogSelectorLabel,
   RemarksHeader,
   RemarksRow,
   RemarksTotal,
-  StatusBar,
+  // StatusBar,
   StatusLabel,
   StatusRow,
   TimeCell,
   TimeHeader,
+  Dot,
 } from "../../style/driver.hos.styles";
 import LoadingSpinner from "./LoadingSpinner";
 import EmptyState from "./EmptyState";
@@ -19,6 +24,8 @@ const DriverHoursOfService = ({ tripId }) => {
   const [driverData, setDriverData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedLogIndex, setSelectedLogIndex] = useState(0);
+  const [transformedLogs, setTransformedLogs] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,8 +36,14 @@ const DriverHoursOfService = ({ tripId }) => {
           "GET",
           null
         );
-        const transformedData = transformApiData(response);
-        setDriverData(transformedData);
+
+        if (response && response.daily_logs && response.daily_logs.length > 0) {
+          const logs = response.daily_logs.map((log) =>
+            transformLogData(log, response.trip_id)
+          );
+          setTransformedLogs(logs);
+          setDriverData(logs[0]);
+        }
       } catch (err) {
         setError("Failed to load driver hours of service data");
         console.error("Error fetching driver data:", err);
@@ -42,37 +55,34 @@ const DriverHoursOfService = ({ tripId }) => {
     fetchData();
   }, [tripId]);
 
-  // Transform API data to the format needed for rendering
-  const transformApiData = (apiData) => {
-    if (!apiData || !apiData.daily_logs || apiData.daily_logs.length === 0) {
-      return null;
+  useEffect(() => {
+    if (
+      transformedLogs.length > 0 &&
+      selectedLogIndex >= 0 &&
+      selectedLogIndex < transformedLogs.length
+    ) {
+      setDriverData(transformedLogs[selectedLogIndex]);
     }
+  }, [selectedLogIndex, transformedLogs]);
 
-    // For simplicity, we'll use the most recent daily log
-    const dailyLog = apiData.daily_logs[0];
+  const transformLogData = (dailyLog, tripId) => {
     const entries = dailyLog.entries || [];
 
-    // Calculate totals for each activity type
     let offDutyHours = 0;
     let sleeperBerthHours = 0;
     let drivingHours = 0;
     let onDutyHours = 0;
 
-    // Transform entries to status changes
     const statusChanges = [];
-    const locations = [];
+    // const locations = [];
 
     entries.forEach((entry) => {
-      // Parse times to hours since midnight
       const startTimeParts = entry.start_time.split(":");
-      const endTimeParts = entry.end_time.split(":");
-
+      const endTimeParts = entry.start_time.split(":");
       const startHour =
         parseInt(startTimeParts[0]) + parseInt(startTimeParts[1]) / 60;
       const endHour =
         parseInt(endTimeParts[0]) + parseInt(endTimeParts[1]) / 60;
-
-      // Map API activity to our status types
       let status;
       switch (entry.activity) {
         case "off duty":
@@ -97,87 +107,65 @@ const DriverHoursOfService = ({ tripId }) => {
       }
 
       statusChanges.push({ status, startHour, endHour });
-
-      // Add location at the start time
-      if (entry.location) {
-        // Format address to show only the city name if possible
-        let locationName = entry.location.address;
-
-        // If it's coordinates, try to extract meaningful info
-        if (locationName.startsWith("Coordinates:")) {
-          locationName = `Location at ${entry.start_time}`;
-        }
-
-        locations.push({
-          name: locationName,
-          hour: startHour,
-        });
-      }
-
-      // Add end location for driving entries
-      if (entry.activity === "driving" && entry.end_location) {
-        let locationName = entry.end_location.address;
-
-        if (locationName.startsWith("Coordinates:")) {
-          locationName = `Location at ${entry.end_time}`;
-        }
-
-        locations.push({
-          name: locationName,
-          hour: endHour,
-        });
-      }
     });
 
     const totalHours =
       offDutyHours + sleeperBerthHours + drivingHours + onDutyHours;
 
+    const formattedDate = new Date(dailyLog.date).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
     return {
-      pro_shipping_no: apiData.trip_id,
+      id: dailyLog.id || `log-${dailyLog.date}`,
+      pro_shipping_no: tripId,
       offDutyHours: parseFloat(offDutyHours.toFixed(2)),
       sleeperBerthHours: parseFloat(sleeperBerthHours.toFixed(2)),
       drivingHours: parseFloat(drivingHours.toFixed(2)),
       onDutyHours: parseFloat(onDutyHours.toFixed(2)),
       totalHours: parseFloat(totalHours.toFixed(2)),
       statusChanges,
-      locations,
       date: dailyLog.date,
+      formattedDate,
     };
   };
 
-  // Generate time headers
   const generateTimeHeaders = () => {
     const timeHeaders = [];
     timeHeaders.push(<TimeCell key="header-label"></TimeCell>);
     for (let i = 0; i < 24; i++) {
-      if (i === 0) {
-        timeHeaders.push(<TimeCell key={`header-${i}`}>Midnight</TimeCell>);
-      } else if (i === 12) {
-        timeHeaders.push(<TimeCell key={`header-${i}`}>Noon</TimeCell>);
-      } else {
-        timeHeaders.push(<TimeCell key={`header-${i}`}>{i}</TimeCell>);
-      }
+      // const label = i === 0 ? "Midnight" : i === 12 ? "Noon" : `${i}`;
+      timeHeaders.push(<TimeCell key={`header-${i}`}>{i}</TimeCell>);
     }
     return timeHeaders;
   };
 
-  // Function to render status bars
-  const renderStatusBars = (statusType) => {
+  const renderStatusDots = (statusType) => {
     if (!driverData || !driverData.statusChanges) return null;
 
     return driverData.statusChanges
       .filter((change) => change.status === statusType)
       .map((change, index) => {
-        const startPercent = (change.startHour / 24) * 100;
-        const width = ((change.endHour - change.startHour) / 24) * 100;
+        console.log("--------------");
+        console.log(change);
+        const left = (change.startHour / 24) * 100;
+        console.log(left);
+
+        const startDot = 129 + 21 * change.startHour;
+        // const endDot = 129 + 21 * change.endHour;
+
         return (
-          <StatusBar
-            key={`${statusType}-${index}`}
-            style={{
-              left: `calc(120px + ${startPercent}% * (100% - 120px) / 100)`,
-              width: `calc(${width}% * (100% - 120px) / 100)`,
-            }}
-          />
+          <>
+            <Dot
+              key={`${statusType}-${index}`}
+              style={{
+                left: `${startDot}px`,
+              }}
+            />
+          </>
         );
       });
   };
@@ -193,34 +181,55 @@ const DriverHoursOfService = ({ tripId }) => {
   const timeHeaders = generateTimeHeaders();
 
   return (
-    <EldContainer>
-      <TimeHeader>{timeHeaders}</TimeHeader>
-      <StatusRow>
-        <StatusLabel>Off Duty</StatusLabel>
-        {renderStatusBars("offDuty")}
-        <HoursTotal>{driverData.offDutyHours}</HoursTotal>
-      </StatusRow>
-      <StatusRow>
-        <StatusLabel>Sleeper Berth</StatusLabel>
-        {renderStatusBars("sleeperBerth")}
-        <HoursTotal>{driverData.sleeperBerthHours}</HoursTotal>
-      </StatusRow>
-      <StatusRow>
-        <StatusLabel>Driving</StatusLabel>
-        {renderStatusBars("driving")}
-        <HoursTotal>{driverData.drivingHours}</HoursTotal>
-      </StatusRow>
-      <StatusRow>
-        <StatusLabel>On Duty</StatusLabel>
-        {renderStatusBars("onDuty")}
-        <HoursTotal>{driverData.onDutyHours}</HoursTotal>
-      </StatusRow>
-      <TimeHeader>{timeHeaders}</TimeHeader>
-      <RemarksRow>
-        <RemarksHeader>REMARKS</RemarksHeader>
-        <RemarksTotal>={driverData.totalHours}</RemarksTotal>
-      </RemarksRow>
-    </EldContainer>
+    <>
+      <LogSelectorContainer>
+        {transformedLogs.length > 1 && (
+          <>
+            <LogSelectorLabel>Select Log Date:</LogSelectorLabel>
+            <LogSelector
+              value={selectedLogIndex}
+              onChange={(e) => setSelectedLogIndex(parseInt(e.target.value))}
+            >
+              {transformedLogs.map((log, index) => (
+                <option key={log.id} value={index}>
+                  {log.formattedDate}
+                </option>
+              ))}
+            </LogSelector>
+          </>
+        )}
+        <DateDisplay>{driverData.formattedDate}</DateDisplay>
+      </LogSelectorContainer>
+
+      <EldContainer>
+        <TimeHeader>{timeHeaders}</TimeHeader>
+        <StatusRow>
+          <StatusLabel>Off Duty</StatusLabel>
+          {renderStatusDots("offDuty")}
+          <HoursTotal>{driverData.offDutyHours}</HoursTotal>
+        </StatusRow>
+        <StatusRow>
+          <StatusLabel>Sleeper Berth</StatusLabel>
+          {renderStatusDots("sleeperBerth")}
+          <HoursTotal>{driverData.sleeperBerthHours}</HoursTotal>
+        </StatusRow>
+        <StatusRow>
+          <StatusLabel>Driving</StatusLabel>
+          {renderStatusDots("driving")}
+          <HoursTotal>{driverData.drivingHours}</HoursTotal>
+        </StatusRow>
+        <StatusRow>
+          <StatusLabel>On Duty</StatusLabel>
+          {renderStatusDots("onDuty")}
+          <HoursTotal>{driverData.onDutyHours}</HoursTotal>
+        </StatusRow>
+        <TimeHeader>{timeHeaders}</TimeHeader>
+        <RemarksRow>
+          <RemarksHeader>REMARKS</RemarksHeader>
+          <RemarksTotal>={driverData.totalHours}</RemarksTotal>
+        </RemarksRow>
+      </EldContainer>
+    </>
   );
 };
 
