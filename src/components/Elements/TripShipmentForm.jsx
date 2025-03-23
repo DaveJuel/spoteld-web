@@ -4,6 +4,7 @@ import {
   LabelRow,
   Label,
   StyledInput,
+  StyledSelect,
   LocationFieldset,
 } from "../../style/view.styles";
 
@@ -79,13 +80,21 @@ const TripShipmentForm = ({ formData, setFormData, setIsNextDisabled }) => {
         <LabelRow>
           <Label htmlFor="load_unit">Measured In (kg, lb, ton):</Label>
         </LabelRow>
-        <StyledInput
-          type="text"
+        <StyledSelect
           name="load_unit"
           value={formData.shipmentDetails.load_unit || ""}
           onChange={handleInputChange}
-          placeholder="Enter measurement unit"
-        />
+        >
+          <option value="" disabled>
+            Select measurement unit
+          </option>
+          <option value="kgs">kgs</option>
+          <option value="lbs">lbs</option>
+          <option value="tons">tons</option>
+          <option value="units">units</option>
+          <option value="m3">cubic meter</option>
+          <option value="other">other</option>
+        </StyledSelect>
       </LocationFieldset>
     </Form>
   );

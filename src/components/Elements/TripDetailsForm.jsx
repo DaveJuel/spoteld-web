@@ -46,7 +46,12 @@ const ChevronUpIcon = (props) => (
   </svg>
 );
 
-export default function TripDetailsForm({ formData, setSelectedField }) {
+export default function TripDetailsForm({
+  formData,
+  setFormData,
+  setSelectedField,
+  handleSearchLocation,
+}) {
   const [expandedFields, setExpandedFields] = useState({
     currentLocation: false,
     pickUpLocation: false,
@@ -62,6 +67,29 @@ export default function TripDetailsForm({ formData, setSelectedField }) {
       ...expandedFields,
       [field]: !expandedFields[field],
     });
+  };
+
+  const handleInputChange = (e, field) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [field]: {
+        ...prevFormData[field],
+        address_line: e.target.value,
+      },
+    }));
+  };
+
+  const handleKeyDown = (e, field) => {
+    const specialKeys = ["Enter"];
+
+    if (specialKeys.includes(e.key)) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (formData[field]?.address_line?.trim()) {
+          handleSearchLocation(formData[field].address_line);
+        }
+      }
+    }
   };
 
   const renderLocationDetails = (location, field) => {
@@ -134,6 +162,9 @@ export default function TripDetailsForm({ formData, setSelectedField }) {
               } location on the map.`}
               value={formData[field]?.address_line || ""}
               onClick={() => handleClick(field)}
+              onChange={(e) => handleInputChange(e, field)}
+              onKeyDown={(e) => handleKeyDown(e, field)}
+              $hasCoordinates={!!(formData[field]?.latitude && formData[field]?.longitude)}
             />
           </InputWrapper>
 

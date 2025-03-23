@@ -39,9 +39,27 @@ const formatLocation = (location) => {
 
 export default function TripRoutes() {
   const [formData, setFormData] = useState({
-    currentLocation: null,
-    pickUpLocation: null,
-    dropOffLocation: null,
+    currentLocation: {
+      address_line: "",
+      city: "",
+      country: "",
+      latitude: null,
+      longitude: null,
+    },
+    pickUpLocation: {
+      address_line: "",
+      city: "",
+      country: "",
+      latitude: null,
+      longitude: null,
+    },
+    dropOffLocation: {
+      address_line: "",
+      city: "",
+      country: "",
+      latitude: null,
+      longitude: null,
+    },
     shipmentDetails: {},
     schedulingDetails: {},
   });
@@ -52,6 +70,7 @@ export default function TripRoutes() {
   const [driver, setDriver] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isNextDisabled, setIsNextDisabled] = useState(true);
+  const [searchLocationQuery, setSearchLocationQuery] = useState("");
 
   useEffect(() => {
     const fetchDriver = async () => {
@@ -80,6 +99,10 @@ export default function TripRoutes() {
       selectedField === "dropOffLocation"
     )
       setIsNextDisabled(false);
+  };
+
+  const handleMapSearch = (query) => {
+    setSearchLocationQuery(query);
   };
 
   const handleNext = async () => {
@@ -162,7 +185,9 @@ export default function TripRoutes() {
         {currentStep === 1 && (
           <TripDetailsForm
             formData={formData}
+            setFormData={setFormData}
             setSelectedField={setSelectedField}
+            handleSearchLocation={handleMapSearch}
           />
         )}
         {currentStep === 2 && (
@@ -218,9 +243,17 @@ export default function TripRoutes() {
   const rightContent = (
     <>
       {currentStep === 4 ? (
-        <DailyLogLayout tripId={tripId} formData={formData} onMapClick={handleMapClick} />
+        <DailyLogLayout
+          tripId={tripId}
+          formData={formData}
+          onMapClick={handleMapClick}
+        />
       ) : (
-        <MapView mapData={formData} onMapClick={handleMapClick} />
+        <MapView
+          mapData={formData}
+          onMapClick={handleMapClick}
+          searchLocationQuery={searchLocationQuery}
+        />
       )}
     </>
   );
