@@ -84,8 +84,11 @@ export default function MapView({ mapData, onMapClick, searchLocationQuery }) {
   useEffect(() => {
     const getRoutes = async () => {
       let newRoutes = [];
-
       if (mapData.currentLocation && mapData.pickUpLocation) {
+        const map = mapRef.current;
+        if (map && mapData?.pickUpLocation?.latitude && mapData?.pickUpLocation?.longitude ) {
+          map.setView([mapData.pickUpLocation.latitude, mapData.pickUpLocation.longitude], 13);
+        }
         const route1Data = await fetchRoute(
           mapData.currentLocation,
           mapData.pickUpLocation
