@@ -58,7 +58,6 @@ export default function MapView({
   useEffect(() => {
     const handleMapSearch = async (query) => {
       if (!query) return;
-
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
@@ -91,7 +90,7 @@ export default function MapView({
   useEffect(() => {
     const getRoutes = async () => {
       let newRoutes = [];
-      if (mapData.currentLocation && mapData.pickUpLocation) {
+      if (mapData?.currentLocation?.latitude && mapData?.pickUpLocation?.latitude) {
         const map = mapRef.current;
         if (
           map &&
@@ -120,7 +119,7 @@ export default function MapView({
         }
       }
 
-      if (mapData.pickUpLocation && mapData.dropOffLocation) {
+      if (mapData?.pickUpLocation?.latitude && mapData?.dropOffLocation?.latitude) {
         const route2Data = await fetchRoute(
           mapData.pickUpLocation,
           mapData.dropOffLocation
@@ -130,7 +129,7 @@ export default function MapView({
           newRoutes.push({
             ...route2Data,
             type: "toDropOff",
-            color: "#ff4500", // Red-orange for pickup to drop-off
+            color: "#ff4500",
             weight: 4,
             opacity: 0.8,
             label: "Route to drop-off location",

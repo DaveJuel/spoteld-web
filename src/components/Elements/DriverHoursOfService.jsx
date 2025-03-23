@@ -149,14 +149,7 @@ const DriverHoursOfService = ({ tripId }) => {
     return driverData.statusChanges
       .filter((change) => change.status === statusType)
       .map((change, index) => {
-        console.log("--------------");
-        console.log(change);
-        const left = (change.startHour / 24) * 100;
-        console.log(left);
-
         const startDot = 129 + 21 * change.startHour;
-        // const endDot = 129 + 21 * change.endHour;
-
         return (
           <>
             <Dot
