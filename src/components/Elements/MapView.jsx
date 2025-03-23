@@ -39,35 +39,15 @@ const markerIcons = {
   }),
 };
 
-export default function MapView({ mapData, onMapClick, searchLocationQuery }) {
+export default function MapView({
+  mapData,
+  onMapClick,
+  searchLocationQuery,
+  setLoadingMap,
+  loadingMap
+}) {
   const [routes, setRoutes] = useState([]);
   const mapRef = useRef(null);
-
-  const handleMapSearch = async (query) => {
-    if (!query) return;
-
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          query
-        )}`
-      );
-      const results = await response.json();
-
-      if (results.length > 0) {
-        const { lat, lon } = results[0];
-        const map = mapRef.current;
-
-        if (map) {
-          map.setView([lat, lon], 13); // Zoom level 13 for a good view
-        }
-      } else {
-        alert("Location not found");
-      }
-    } catch (error) {
-      console.error("Error fetching location:", error);
-    }
-  };
 
   const SetMapRef = () => {
     const map = useMap();
@@ -76,18 +56,52 @@ export default function MapView({ mapData, onMapClick, searchLocationQuery }) {
   };
 
   useEffect(() => {
+    const handleMapSearch = async (query) => {
+      if (!query) return;
+
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            query
+          )}`
+        );
+        const results = await response.json();
+
+        if (results.length > 0) {
+          const { lat, lon } = results[0];
+          const map = mapRef.current;
+
+          if (map) {
+            map.setView([lat, lon], 13);
+            setLoadingMap(false);
+          }
+        } else {
+          alert("Location not found");
+        }
+      } catch (error) {
+        console.error("Error fetching location:", error);
+      }
+    };
+
     if (searchLocationQuery) {
       handleMapSearch(searchLocationQuery);
-  }
-  }, [searchLocationQuery]);
+    }
+  }, [searchLocationQuery, loadingMap, setLoadingMap]);
 
   useEffect(() => {
     const getRoutes = async () => {
       let newRoutes = [];
       if (mapData.currentLocation && mapData.pickUpLocation) {
         const map = mapRef.current;
-        if (map && mapData?.pickUpLocation?.latitude && mapData?.pickUpLocation?.longitude ) {
-          map.setView([mapData.pickUpLocation.latitude, mapData.pickUpLocation.longitude], 13);
+        if (
+          map &&
+          mapData?.pickUpLocation?.latitude &&
+          mapData?.pickUpLocation?.longitude
+        ) {
+          map.setView(
+            [mapData.pickUpLocation.latitude, mapData.pickUpLocation.longitude],
+            13
+          );
         }
         const route1Data = await fetchRoute(
           mapData.currentLocation,
@@ -171,7 +185,7 @@ export default function MapView({ mapData, onMapClick, searchLocationQuery }) {
     });
   }
 
-  if (mapData?.dropOffLocation &&mapData?.dropOffLocation?.latitude) {
+  if (mapData?.dropOffLocation && mapData?.dropOffLocation?.latitude) {
     markers.push({
       position: [
         mapData.dropOffLocation.latitude,

@@ -69,6 +69,7 @@ export default function TripRoutes() {
   const [shipmentId, setShipmentId] = useState(null);
   const [driver, setDriver] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMap, setLoadingMap] = useState(false);
   const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [searchLocationQuery, setSearchLocationQuery] = useState("");
 
@@ -103,6 +104,7 @@ export default function TripRoutes() {
 
   const handleMapSearch = (query) => {
     setSearchLocationQuery(query);
+    setLoadingMap(true);
   };
 
   const handleNext = async () => {
@@ -249,11 +251,18 @@ export default function TripRoutes() {
           onMapClick={handleMapClick}
         />
       ) : (
-        <MapView
-          mapData={formData}
-          onMapClick={handleMapClick}
-          searchLocationQuery={searchLocationQuery}
-        />
+        <>
+          {loadingMap && <LoadingSpinner message="Loading location" />}
+          {!loadingMap && (
+            <MapView
+              mapData={formData}
+              onMapClick={handleMapClick}
+              searchLocationQuery={searchLocationQuery}
+              setLoadingMap={setLoadingMap}
+              loadingMap={loadingMap}
+            />
+          )}
+        </>
       )}
     </>
   );
