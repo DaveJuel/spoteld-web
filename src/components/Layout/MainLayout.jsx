@@ -13,14 +13,11 @@ import { MainContainer, ContentWrapper, LeftSection, RightSection } from "../../
 const MainLayout = ({
   leftContent,
   rightContent,
-  initialSidebarWidth = 240,
-  initialSidebarState = true
+  initialSidebarWidth = 240
 }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(initialSidebarState);
   const [sidebarWidth, setSidebarWidth] = useState(initialSidebarWidth);
 
   const handleSidebarChange = (isOpen, width) => {
-    setSidebarOpen(isOpen);
     setSidebarWidth(width);
   };
 
@@ -28,7 +25,6 @@ const MainLayout = ({
     <MainContainer>
       <SidebarNav
         onStateChange={handleSidebarChange}
-        sidebarOpen={sidebarOpen}
       />
       <ContentWrapper sidebarWidth={sidebarWidth}>
         <LeftSection>

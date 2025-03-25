@@ -18,8 +18,8 @@ import {
 } from "../../style/sidebar.styles";
 import { logoutUser } from "../../utils/AuthHandler";
 
-const SidebarNav = ({ onStateChange, sidebarOpen }) => {
-  const [isOpen, setIsOpen] = useState(sidebarOpen);
+const SidebarNav = ({ onStateChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const expandedWidth = 240;
   const collapsedWidth = 70;
 

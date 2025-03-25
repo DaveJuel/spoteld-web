@@ -8,7 +8,7 @@ const DriverForm = ({editing, setEditing}) => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isNewProfile, setIsNewProfile] = useState(true);
-  const statuses = ["off duty", "sleeper berth", "driving", "on duty"];
+  const statuses = ["off_duty", "sleeper_berth", "driving", "on_duty"];
 
   useEffect(() => {
     const fetchDriverProfile = async () => {

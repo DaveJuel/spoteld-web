@@ -153,13 +153,13 @@ export default function TripDetailsForm({
             <StyledInput
               type="text"
               name={field}
-              placeholder={`Select ${
+              placeholder={`Type ${
                 field === "currentLocation"
                   ? "current"
                   : field === "pickUpLocation"
                   ? "pick-up"
                   : "drop-off"
-              } location on the map.`}
+              } location, and press enter.`}
               value={formData[field]?.address_line || ""}
               onClick={() => handleClick(field)}
               onChange={(e) => handleInputChange(e, field)}
