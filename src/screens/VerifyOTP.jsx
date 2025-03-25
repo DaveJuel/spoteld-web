@@ -32,7 +32,7 @@ export default function VerifyOTP() {
       const result = await response.json();
 
       if (response.ok) {
-        navigate("/login");  // Redirect to login page upon successful OTP verification
+        navigate("/login");
       } else {
         setMessage(result.message || "OTP verification failed. Please try again.");
       }
